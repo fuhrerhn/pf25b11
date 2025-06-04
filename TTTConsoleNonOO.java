@@ -32,26 +32,42 @@ public class TTTConsoleNonOO {
     /** The entry main method (the program starts here) */
     public static void main(String[] args) {
         // Initialize the board, currentState and currentPlayer
-        initGame();
-
-        // Play the game once
         do {
-            // currentPlayer makes a move
-            // Update board[selectedRow][selectedCol] and currentState
-            stepGame();
-            // Refresh the display
-            paintBoard();
-            // Print message if game over
-            if (currentState == CROSS_WON) {
-                System.out.println("'X' won!\nBye!");
-            } else if (currentState == NOUGHT_WON) {
-                System.out.println("'O' won!\nBye!");
-            } else if (currentState == DRAW) {
-                System.out.println("It's a Draw!\nBye!");
-            }
-            // Switch currentPlayer
-            currentPlayer = (currentPlayer == CROSS) ? NOUGHT : CROSS;
-        } while (currentState == PLAYING); // repeat if not game over
+            initGame();
+
+            // Play the game once
+            do {
+                // currentPlayer makes a move
+                // Update board[selectedRow][selectedCol] and currentState
+                stepGame();
+                // Refresh the display
+                paintBoard();
+                // Print message if game over
+                if (currentState == CROSS_WON) {
+                    System.out.println("'X' won!\nBye!");
+                } else if (currentState == NOUGHT_WON) {
+                    System.out.println("'O' won!\nBye!");
+                } else if (currentState == DRAW) {
+                    System.out.println("It's a Draw!\nBye!");
+                }
+                // Switch currentPlayer
+                currentPlayer = (currentPlayer == CROSS) ? NOUGHT : CROSS;
+            } while (currentState == PLAYING); // repeat if not game over
+
+            boolean valid = true;
+            do {
+                System.out.print("Play again (y/n)? ");
+                char ans = in.next().charAt(0);
+                if (ans == 'n' || ans == 'N') {
+                    valid = false;
+                    System.out.println("Bye!");
+                    System.exit(0);  // terminate the program
+                }
+                else if (ans == 'y' || ans =='Y') {
+                    valid = false;                }
+            } while(valid);
+
+        } while (true);
     }
 
     /** Initialize the board[][], currentState and currentPlayer for a new game*/
