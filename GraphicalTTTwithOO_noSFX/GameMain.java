@@ -1,4 +1,4 @@
-package GraphicalTTTwithOO;
+package GraphicalTTTwithOO_noSFX;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;

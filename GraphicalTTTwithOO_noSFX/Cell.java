@@ -1,4 +1,4 @@
-package GraphicalTTTwithOO;
+package GraphicalTTTwithOO_noSFX;
 import java.awt.*;
 /**
  * The Cell class models each individual cell of the game board.

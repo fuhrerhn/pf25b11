@@ -12,8 +12,8 @@ public class GameMain extends JPanel {
 
     // Define named constants for the drawing graphics
     public static final String TITLE = "Tic Tac Toe";
-    public static final Color COLOR_BG = Color.WHITE;
-    public static final Color COLOR_BG_STATUS = new Color(216, 216, 216);
+    public static final Color COLOR_BG = Color.BLACK;
+    public static final Color COLOR_BG_STATUS = new Color(36, 36, 36);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);  // Red #EF6950
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225); // Blue #409AE1
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
@@ -42,6 +42,12 @@ public class GameMain extends JPanel {
                             && board.cells[row][col].content == Seed.NO_SEED) {
                         // Update cells[][] and return the new game state after the move
                         currentState = board.stepGame(currentPlayer, row, col);
+                        // Play appropriate sound clip
+                        if (currentState == State.PLAYING) {
+                            SoundEffect.EAT_FOOD.play();
+                        } else {
+                            SoundEffect.DIE.play();
+                        }
                         // Switch player
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
                     }
