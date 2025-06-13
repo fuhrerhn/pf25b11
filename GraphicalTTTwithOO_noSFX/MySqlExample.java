@@ -14,7 +14,7 @@ public class MySqlExample {
                 port = "23308";
                 databaseName = "tictactoedb";
                 userName = "avnadmin";
-                        password = "AVNS_yJalhq5JBAgd9LeEGxU";
+                password = "AVNS_yJalhq5JBAgd9LeEGxU";
         /*for (int i = 0; i < args.length - 1; i++) {
             switch (args[i].toLowerCase(Locale.ROOT)) {
                 case "-host": host = args[++i]; break;
