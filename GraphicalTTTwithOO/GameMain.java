@@ -144,41 +144,38 @@ public class GameMain extends JPanel {
         });
     }
 
-    static String getPassword(String uName) throws ClassNotFoundException{
+    static String getPassword(String uName) throws ClassNotFoundException {
         String pass = "";
-        String host, port, databaseName, userName, password;
-        host = "mysql-tictactoe-pf2511b.c.aivencloud.com";
-        port = "23308";
-        databaseName = "tictactoedb";
-        userName = "avnadmin";
-        password = "AVNS_yJalhq5JBAgd9LeEGxU";
-        /*for (int i = 0; i < args.length - 1; i++) {
-            switch (args[i].toLowerCase(Locale.ROOT)) {
-                case "-host": host = args[++i]; break;
-                case "-username": userName = args[++i]; break;
-                case "-password": password = args[++i]; break;
-                case "-database": databaseName = args[++i]; break;
-                case "-port": port = args[++i]; break;
-            }
-        }*/
-        //JDBC allows to have nullable username and password
+        String host = "mysql-tictactoe-pf2511b.c.aivencloud.com";
+        String port = "23308";
+        String databaseName = "tictactoedb";
+        String userName = "avnadmin";
+        String password = "AVNS_yJalhq5JBAgd9LeEGxU";
+
         if (host == null || port == null || databaseName == null) {
             System.out.println("Host, port, database information is required");
             return "";
         }
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try (final Connection connection =
-                     DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + databaseName + "?sslmode=require", userName, password);
-             final Statement statement = connection.createStatement();
-             final ResultSet resultSet = statement.executeQuery("SELECT password FROM game_user")) {
 
-            while (resultSet.next()) {
-//                System.out.println("Username: " + resultSet.getString("username"));
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        String sql = "SELECT password FROM game_user WHERE username = ?";
+        try (Connection connection = DriverManager.getConnection(
+                "jdbc:mysql://" + host + ":" + port + "/" + databaseName + "?sslmode=require",
+                userName, password);
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            pstmt.setString(1, uName);
+            ResultSet resultSet = pstmt.executeQuery();
+
+            if (resultSet.next()) {
                 pass = resultSet.getString("password");
             }
         } catch (SQLException e) {
             System.out.println("Connection failure.");
             e.printStackTrace();
-        } return pass;
+        }
+        return pass;
     }
+
 }
