@@ -16,8 +16,8 @@ import javax.swing.ImageIcon;
  *  however, not supported.
  */
 public enum Seed {   // to save as "Seed.java"
-    CROSS("X", "images/cross.png"),   // displayName, imageFilename
-    NOUGHT("O", "images/not.png"),
+    CROSS("X", "GraphicalTTTwithOOnSFX/images/cross.png"),   // displayName, imageFilename
+    NOUGHT("O", "GraphicalTTTwithOOnSFX/images/not.png"),
     NO_SEED(" ", null);
 
     // Private variables
@@ -34,6 +34,7 @@ public enum Seed {   // to save as "Seed.java"
             if (imgURL != null) {
                 icon = new ImageIcon(imgURL);
                 //System.out.println(icon);  // debugging
+                img = icon.getImage();
             } else {
                 System.err.println("Couldn't find file " + imageFilename);
             }
