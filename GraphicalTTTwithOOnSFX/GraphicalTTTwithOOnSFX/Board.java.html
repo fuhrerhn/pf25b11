@@ -1,0 +1,131 @@
+<html>
+<head>
+<title>Board.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #5f826b; font-style: italic;}
+.s4 { color: #7a7e85;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Board.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">GraphicalTTTwithOOnSFX</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.*;</span>
+<span class="s3">/**</span>
+ <span class="s3">* The Board class models the ROWS-by-COLS game board.</span>
+ <span class="s3">*/</span>
+<span class="s0">public class </span><span class="s1">Board </span><span class="s2">{</span>
+    <span class="s4">// Define named constants</span>
+    <span class="s0">public static final int </span><span class="s1">ROWS </span><span class="s2">= </span><span class="s5">3</span><span class="s2">;  </span><span class="s4">// ROWS x COLS cells</span>
+    <span class="s0">public static final int </span><span class="s1">COLS </span><span class="s2">= </span><span class="s5">3</span><span class="s2">;</span>
+    <span class="s4">// Define named constants for drawing</span>
+    <span class="s0">public static final int </span><span class="s1">CANVAS_WIDTH </span><span class="s2">= </span><span class="s1">Cell</span><span class="s2">.</span><span class="s1">SIZE </span><span class="s2">* </span><span class="s1">COLS</span><span class="s2">;  </span><span class="s4">// the drawing canvas</span>
+    <span class="s0">public static final int </span><span class="s1">CANVAS_HEIGHT </span><span class="s2">= </span><span class="s1">Cell</span><span class="s2">.</span><span class="s1">SIZE </span><span class="s2">* </span><span class="s1">ROWS</span><span class="s2">;</span>
+    <span class="s0">public static final int </span><span class="s1">GRID_WIDTH </span><span class="s2">= </span><span class="s5">8</span><span class="s2">;  </span><span class="s4">// Grid-line's width</span>
+    <span class="s0">public static final int </span><span class="s1">GRID_WIDTH_HALF </span><span class="s2">= </span><span class="s1">GRID_WIDTH </span><span class="s2">/ </span><span class="s5">2</span><span class="s2">; </span><span class="s4">// Grid-line's half-width</span>
+    <span class="s0">public static final </span><span class="s1">Color COLOR_GRID </span><span class="s2">= </span><span class="s1">Color</span><span class="s2">.</span><span class="s1">LIGHT_GRAY</span><span class="s2">;  </span><span class="s4">// grid lines</span>
+    <span class="s0">public static final int </span><span class="s1">Y_OFFSET </span><span class="s2">= </span><span class="s5">1</span><span class="s2">;  </span><span class="s4">// Fine tune for better display</span>
+
+    <span class="s4">// Define properties (package-visible)</span>
+    <span class="s3">/** Composes of 2D array of ROWS-by-COLS Cell instances */</span>
+    <span class="s1">Cell</span><span class="s2">[][] </span><span class="s1">cells</span><span class="s2">;</span>
+
+    <span class="s3">/** Constructor to initialize the game board */</span>
+    <span class="s0">public </span><span class="s1">Board</span><span class="s2">() {</span>
+        <span class="s1">initGame</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/** Initialize the game objects (run once) */</span>
+    <span class="s0">public void </span><span class="s1">initGame</span><span class="s2">() {</span>
+        <span class="s1">cells </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Cell</span><span class="s2">[</span><span class="s1">ROWS</span><span class="s2">][</span><span class="s1">COLS</span><span class="s2">]; </span><span class="s4">// allocate the array</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">ROWS</span><span class="s2">; ++</span><span class="s1">row</span><span class="s2">) {</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">COLS</span><span class="s2">; ++</span><span class="s1">col</span><span class="s2">) {</span>
+                <span class="s4">// Allocate element of the array</span>
+                <span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">] = </span><span class="s0">new </span><span class="s1">Cell</span><span class="s2">(</span><span class="s1">row</span><span class="s2">, </span><span class="s1">col</span><span class="s2">);</span>
+                <span class="s4">// Cells are initialized in the constructor</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/** Reset the game board, ready for new game */</span>
+    <span class="s0">public void </span><span class="s1">newGame</span><span class="s2">() {</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">ROWS</span><span class="s2">; ++</span><span class="s1">row</span><span class="s2">) {</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">COLS</span><span class="s2">; ++</span><span class="s1">col</span><span class="s2">) {</span>
+                <span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">].</span><span class="s1">newGame</span><span class="s2">(); </span><span class="s4">// clear the cell content</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">*  The given player makes a move on (selectedRow, selectedCol).</span>
+     <span class="s3">*  Update cells[selectedRow][selectedCol]. Compute and return the</span>
+     <span class="s3">*  new game state (PLAYING, DRAW, CROSS_WON, NOUGHT_WON).</span>
+     <span class="s3">*/</span>
+    <span class="s0">public </span><span class="s1">State stepGame</span><span class="s2">(</span><span class="s1">Seed player</span><span class="s2">, </span><span class="s0">int </span><span class="s1">selectedRow</span><span class="s2">, </span><span class="s0">int </span><span class="s1">selectedCol</span><span class="s2">) {</span>
+        <span class="s4">// Update game board</span>
+        <span class="s1">cells</span><span class="s2">[</span><span class="s1">selectedRow</span><span class="s2">][</span><span class="s1">selectedCol</span><span class="s2">].</span><span class="s1">content </span><span class="s2">= </span><span class="s1">player</span><span class="s2">;</span>
+
+        <span class="s4">// Compute and return the new game state</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">selectedRow</span><span class="s2">][</span><span class="s5">0</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player  </span><span class="s4">// 3-in-the-row</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s1">selectedRow</span><span class="s2">][</span><span class="s5">1</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s1">selectedRow</span><span class="s2">][</span><span class="s5">2</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">|| </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">0</span><span class="s2">][</span><span class="s1">selectedCol</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player </span><span class="s4">// 3-in-the-column</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">1</span><span class="s2">][</span><span class="s1">selectedCol</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">2</span><span class="s2">][</span><span class="s1">selectedCol</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">|| </span><span class="s1">selectedRow </span><span class="s2">== </span><span class="s1">selectedCol     </span><span class="s4">// 3-in-the-diagonal</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">0</span><span class="s2">][</span><span class="s5">0</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">1</span><span class="s2">][</span><span class="s5">1</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">2</span><span class="s2">][</span><span class="s5">2</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">|| </span><span class="s1">selectedRow </span><span class="s2">+ </span><span class="s1">selectedCol </span><span class="s2">== </span><span class="s5">2 </span><span class="s4">// 3-in-the-opposite-diagonal</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">0</span><span class="s2">][</span><span class="s5">2</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">1</span><span class="s2">][</span><span class="s5">1</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span>
+                <span class="s2">&amp;&amp; </span><span class="s1">cells</span><span class="s2">[</span><span class="s5">2</span><span class="s2">][</span><span class="s5">0</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">player</span><span class="s2">) {</span>
+            <span class="s0">return </span><span class="s2">(</span><span class="s1">player </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) ? </span><span class="s1">State</span><span class="s2">.</span><span class="s1">CROSS_WON </span><span class="s2">: </span><span class="s1">State</span><span class="s2">.</span><span class="s1">NOUGHT_WON</span><span class="s2">;</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s4">// Nobody win. Check for DRAW (all cells occupied) or PLAYING.</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">ROWS</span><span class="s2">; ++</span><span class="s1">row</span><span class="s2">) {</span>
+                <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">COLS</span><span class="s2">; ++</span><span class="s1">col</span><span class="s2">) {</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NO_SEED</span><span class="s2">) {</span>
+                        <span class="s0">return </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">; </span><span class="s4">// still have empty cells</span>
+                    <span class="s2">}</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+            <span class="s0">return </span><span class="s1">State</span><span class="s2">.</span><span class="s1">DRAW</span><span class="s2">; </span><span class="s4">// no empty cell, it's a draw</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/** Paint itself on the graphics canvas, given the Graphics context */</span>
+    <span class="s0">public void </span><span class="s1">paint</span><span class="s2">(</span><span class="s1">Graphics g</span><span class="s2">) {</span>
+        <span class="s4">// Draw the grid-lines</span>
+        <span class="s1">g</span><span class="s2">.</span><span class="s1">setColor</span><span class="s2">(</span><span class="s1">COLOR_GRID</span><span class="s2">);</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s5">1</span><span class="s2">; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">ROWS</span><span class="s2">; ++</span><span class="s1">row</span><span class="s2">) {</span>
+            <span class="s1">g</span><span class="s2">.</span><span class="s1">fillRoundRect</span><span class="s2">(</span><span class="s5">0</span><span class="s2">, </span><span class="s1">Cell</span><span class="s2">.</span><span class="s1">SIZE </span><span class="s2">* </span><span class="s1">row </span><span class="s2">- </span><span class="s1">GRID_WIDTH_HALF</span><span class="s2">,</span>
+                    <span class="s1">CANVAS_WIDTH </span><span class="s2">- </span><span class="s5">1</span><span class="s2">, </span><span class="s1">GRID_WIDTH</span><span class="s2">,</span>
+                    <span class="s1">GRID_WIDTH</span><span class="s2">, </span><span class="s1">GRID_WIDTH</span><span class="s2">);</span>
+        <span class="s2">}</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s5">1</span><span class="s2">; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">COLS</span><span class="s2">; ++</span><span class="s1">col</span><span class="s2">) {</span>
+            <span class="s1">g</span><span class="s2">.</span><span class="s1">fillRoundRect</span><span class="s2">(</span><span class="s1">Cell</span><span class="s2">.</span><span class="s1">SIZE </span><span class="s2">* </span><span class="s1">col </span><span class="s2">- </span><span class="s1">GRID_WIDTH_HALF</span><span class="s2">, </span><span class="s5">0 </span><span class="s2">+ </span><span class="s1">Y_OFFSET</span><span class="s2">,</span>
+                    <span class="s1">GRID_WIDTH</span><span class="s2">, </span><span class="s1">CANVAS_HEIGHT </span><span class="s2">- </span><span class="s5">1</span><span class="s2">,</span>
+                    <span class="s1">GRID_WIDTH</span><span class="s2">, </span><span class="s1">GRID_WIDTH</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s4">// Draw all the cells</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">ROWS</span><span class="s2">; ++</span><span class="s1">row</span><span class="s2">) {</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s5">0</span><span class="s2">; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">COLS</span><span class="s2">; ++</span><span class="s1">col</span><span class="s2">) {</span>
+                <span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">].</span><span class="s1">paint</span><span class="s2">(</span><span class="s1">g</span><span class="s2">);  </span><span class="s4">// ask the cell to paint itself</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

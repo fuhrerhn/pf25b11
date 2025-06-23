@@ -1,22 +1,24 @@
 package GraphicalTTTwithOOnSFX;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Bot {
     private char botPlayerMark;
     private char opponentPlayerMark;
     private Random random;
-    private GameMain.AIDifficulty difficulty; // Tambahkan tingkat kesulitan
+    private GameMain.AIDifficulty difficulty;
 
-    public Bot(char botMark, char opponentMark, GameMain.AIDifficulty difficulty) {
-        this.botPlayerMark = botMark;
-        this.opponentPlayerMark = opponentMark;
+    // UBAH TIPE PARAMETER botSeed dan humanSeed dari 'char' menjadi 'Seed'
+    public Bot(Seed botSeed, Seed humanSeed, GameMain.AIDifficulty difficulty) {
+        this.botPlayerMark = (botSeed == Seed.CROSS) ? 'X' : 'O';
+        this.opponentPlayerMark = (humanSeed == Seed.CROSS) ? 'X' : 'O';
         this.random = new Random();
-        this.difficulty = difficulty; // Inisialisasi tingkat kesulitan
+        this.difficulty = difficulty;
     }
 
     public int[] getBotMove(char[][] boardState) {
-        // Logika AI akan berbeda berdasarkan tingkat kesulitan
         switch (difficulty) {
             case EASY:
                 return makeEasyMove(boardState);
@@ -25,17 +27,15 @@ public class Bot {
             case HARD:
                 return makeHardMove(boardState);
             default:
-                return makeEasyMove(boardState); // Default ke Easy
+                return makeEasyMove(boardState);
         }
     }
 
     private int[] makeEasyMove(char[][] boardState) {
-        // Implementasi AI mudah (gerakan acak)
         return makeRandomMove(boardState);
     }
 
     private int[] makeMediumMove(char[][] boardState) {
-        // Implementasi AI menengah (blokir kemenangan, lalu acak)
         int[] winningMove = findCriticalMove(boardState, botPlayerMark);
         if (winningMove != null) {
             return winningMove;
@@ -50,8 +50,6 @@ public class Bot {
     }
 
     private int[] makeHardMove(char[][] boardState) {
-        // Implementasi AI sulit (contoh: algoritma Minimax - ini memerlukan implementasi yang lebih kompleks)
-        // Untuk contoh ini, kita akan menggunakan logika yang sama dengan medium
         int[] winningMove = findCriticalMove(boardState, botPlayerMark);
         if (winningMove != null) {
             return winningMove;
@@ -62,11 +60,39 @@ public class Bot {
             return blockingMove;
         }
 
-        return makeRandomMove(boardState); // Sementara, gunakan logika medium
+        if (boardState[1][1] == '-') {
+            return new int[]{1, 1};
+        }
+
+        int[][] corners = {{0, 0}, {0, 2}, {2, 0}, {2, 2}};
+        List<int[]> emptyCorners = new ArrayList<>();
+        for (int[] cell : corners) {
+            if (boardState[cell[0]][cell[1]] == '-') {
+                emptyCorners.add(cell);
+            }
+        }
+        if (!emptyCorners.isEmpty()) {
+            return emptyCorners.get(random.nextInt(emptyCorners.size()));
+        }
+
+        int[][] sides = {{0, 1}, {1, 0}, {1, 2}, {2, 1}}; // Tambahkan pemeriksaan sisi
+        List<int[]> emptySides = new ArrayList<>();
+        for (int[] cell : sides) {
+            if (boardState[cell[0]][cell[1]] == '-') {
+                emptySides.add(cell);
+            }
+        }
+        if (!emptySides.isEmpty()) {
+            return emptySides.get(random.nextInt(emptySides.size()));
+        }
+
+
+        return makeRandomMove(boardState);
     }
 
     private int[] findCriticalMove(char[][] boardState, char mark) {
         for (int i = 0; i < 3; i++) {
+            // Check rows
             if (boardState[i][0] == mark && boardState[i][1] == mark && boardState[i][2] == '-')
                 return new int[]{i, 2};
             if (boardState[i][0] == mark && boardState[i][2] == mark && boardState[i][1] == '-')
@@ -74,6 +100,7 @@ public class Bot {
             if (boardState[i][1] == mark && boardState[i][2] == mark && boardState[i][0] == '-')
                 return new int[]{i, 0};
 
+            // Check columns
             if (boardState[0][i] == mark && boardState[1][i] == mark && boardState[2][i] == '-')
                 return new int[]{2, i};
             if (boardState[0][i] == mark && boardState[2][i] == mark && boardState[1][i] == '-')
@@ -82,6 +109,7 @@ public class Bot {
                 return new int[]{0, i};
         }
 
+        // Check diagonals
         if (boardState[0][0] == mark && boardState[1][1] == mark && boardState[2][2] == '-')
             return new int[]{2, 2};
         if (boardState[0][0] == mark && boardState[2][2] == mark && boardState[1][1] == '-')
@@ -100,26 +128,18 @@ public class Bot {
     }
 
     private int[] makeRandomMove(char[][] boardState) {
-        boolean hasEmptyCell = false;
+        List<int[]> emptyCells = new ArrayList<>();
         for (int r = 0; r < 3; r++) {
             for (int c = 0; c < 3; c++) {
                 if (boardState[r][c] == '-') {
-                    hasEmptyCell = true;
-                    break;
+                    emptyCells.add(new int[]{r, c});
                 }
             }
-            if (hasEmptyCell) break;
         }
 
-        if (!hasEmptyCell) {
-            return null;
+        if (emptyCells.isEmpty()) {
+            return new int[]{-1, -1}; // No empty cells, game is likely over
         }
-
-        int row, col;
-        do {
-            row = random.nextInt(3);
-            col = random.nextInt(3);
-        } while (boardState[row][col] != '-');
-        return new int[]{row, col};
+        return emptyCells.get(random.nextInt(emptyCells.size()));
     }
 }
