@@ -12,8 +12,8 @@ public class GameMain extends JPanel {
 
     // Define named constants for the drawing graphics
     public static final String TITLE = "Tic Tac Toe";
-    public static final Color COLOR_BG = Color.BLACK;
-    public static final Color COLOR_BG_STATUS = new Color(36, 36, 36);
+    public static final Color COLOR_BG = new Color(0, 0, 0);
+    public static final Color COLOR_BG_STATUS = new Color(202, 202, 202);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);  // Red #EF6950
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225); // Blue #409AE1
     public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
@@ -120,36 +120,35 @@ public class GameMain extends JPanel {
     }
 
     /** The entry "main" method */
-    public static void main(String[] args)throws ClassNotFoundException {
-        boolean wrongPassword = true;
-        do{
-            Scanner sc = new Scanner(System.in);
-            System.out.print("Enter Username: ");
-            String uName = sc.next();
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Tampilkan login GUI
+                if (!showLoginDialog()) {
+                    System.exit(0); // Tutup jika login batal
+                }
 
-            System.out.print("Password: ");
-            String pass = sc.next();
-            String truePass = getPassword(uName);
-            System.out.println("true pass: " + truePass);
-            if(pass.equals(truePass)){
-                wrongPassword = false;
-            } else{
-                System.out.println("Wrong password. Please try again!");
-            }
-        }while(wrongPassword);
-        // Run GUI construction codes in Event-Dispatching thread for thread safety
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+                // Tampilkan pilihan mode
+                showGameModeDialog();
+
+                // Buka game
                 JFrame frame = new JFrame(TITLE);
-                // Set the content-pane of the JFrame to an instance of main JPanel
                 frame.setContentPane(new GameMain());
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.pack();
-                frame.setLocationRelativeTo(null); // center the application window
-                frame.setVisible(true);            // show it
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null,
+                        "Terjadi kesalahan saat koneksi database.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
             }
         });
     }
+
 
     static String getPassword(String uName) throws ClassNotFoundException {
         String pass = "";
@@ -183,6 +182,78 @@ public class GameMain extends JPanel {
             e.printStackTrace();
         }
         return pass;
+    }
+    // Tambahkan enum mode
+    public enum GameMode {
+        PLAYER_VS_PLAYER,
+        PLAYER_VS_BOT
+    }
+
+    private static GameMode gameMode;
+
+    /** Tampilkan dialog login GUI */
+    private static boolean showLoginDialog() throws ClassNotFoundException {
+        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+        JLabel userLabel = new JLabel("Username:");
+        JTextField userField = new JTextField(15);
+        JLabel passLabel = new JLabel("Password:");
+        JPasswordField passField = new JPasswordField(15);
+
+        panel.add(userLabel);
+        panel.add(userField);
+        panel.add(passLabel);
+        panel.add(passField);
+
+        while (true) {
+            int option = JOptionPane.showConfirmDialog(
+                    null,
+                    panel,
+                    "Login Tic Tac Toe",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+            if (option != JOptionPane.OK_OPTION) {
+                return false; // Batal
+            }
+
+            String uName = userField.getText().trim();
+            String pass = new String(passField.getPassword());
+
+            String truePass = getPassword(uName);
+            if (pass.equals(truePass)) {
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Username atau password salah.\nSilakan coba lagi.",
+                        "Login Gagal",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
+    /** Tampilkan dialog pemilihan mode permainan */
+    private static void showGameModeDialog() {
+        String[] options = {"Player vs Player", "Player vs Bot"};
+        int choice = JOptionPane.showOptionDialog(
+                null,
+                "Pilih Mode Permainan:",
+                "Mode Permainan",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == 0) {
+            gameMode = GameMode.PLAYER_VS_PLAYER;
+        } else if (choice == 1) {
+            gameMode = GameMode.PLAYER_VS_BOT;
+        } else {
+            System.exit(0); // Cancel
+        }
     }
 
 }
