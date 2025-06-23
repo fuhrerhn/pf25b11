@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
-import java.util.concurrent.TimeUnit; // Import ini diperlukan untuk TimeUnit
+import java.util.concurrent.TimeUnit;
 
 public class GameMain extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -22,17 +22,24 @@ public class GameMain extends JPanel {
     private Seed currentPlayer;
     private JLabel statusBar;
 
-    // Tambahkan deklarasi untuk Bot
+    // Tambahkan deklarasi untuk Bot dan tingkat kesulitan
     private Bot aiPlayer;
-    private char humanPlayerChar = 'X'; // Karakter pemain manusia
-    private char aiPlayerChar = 'O';    // Karakter pemain AI
+    private char humanPlayerChar = 'X';
+    private char aiPlayerChar = 'O';
+    private static AIDifficulty aiDifficulty = AIDifficulty.EASY; // Default ke EASY
+
+    // Enum untuk tingkat kesulitan AI
+    public enum AIDifficulty {
+        EASY,
+        MEDIUM,
+        HARD
+    }
 
     public GameMain() {
         super.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (currentState == State.PLAYING) {
-                    // Hanya izinkan pemain manusia mengklik jika itu gilirannya
                     if (gameMode == GameMode.PLAYER_VS_PLAYER || (gameMode == GameMode.PLAYER_VS_BOT && currentPlayer == Seed.CROSS)) {
                         int mouseX = e.getX();
                         int mouseY = e.getY();
@@ -49,14 +56,13 @@ public class GameMain extends JPanel {
                             }
                             currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
 
-                            // Jika mode Player vs Bot dan game masih berjalan, buat AI bergerak
                             if (gameMode == GameMode.PLAYER_VS_BOT && currentState == State.PLAYING) {
-                                makeAIMove(); // Memanggil giliran AI
+                                makeAIMove();
                             }
                         }
                     }
-                } else { // Game over
-                    newGame(); // Restart game
+                } else {
+                    newGame();
                 }
                 repaint();
             }
@@ -76,7 +82,7 @@ public class GameMain extends JPanel {
         super.setBorder(BorderFactory.createLineBorder(COLOR_BG_STATUS, 2, false));
 
         initGame();
-        newGame(); // Dipanggil sekali saat GameMain dibuat
+        newGame();
     }
 
     public void initGame() {
@@ -89,18 +95,17 @@ public class GameMain extends JPanel {
                 board.cells[row][col].content = Seed.NO_SEED;
             }
         }
-        currentPlayer = Seed.CROSS; // Cross (X) selalu memulai
+        currentPlayer = Seed.CROSS;
         currentState = State.PLAYING;
 
-        // Inisialisasi Bot hanya jika mode adalah Player vs Bot
+        // Inisialisasi Bot dengan tingkat kesulitan yang dipilih
         if (gameMode == GameMode.PLAYER_VS_BOT) {
-            aiPlayer = new Bot(aiPlayerChar, humanPlayerChar);
+            aiPlayer = new Bot(aiPlayerChar, humanPlayerChar, aiDifficulty);
         }
         repaint();
     }
 
     private void makeAIMove() {
-        // Beri sedikit jeda agar terlihat seperti "berpikir"
         try {
             TimeUnit.MILLISECONDS.sleep(500);
         } catch (InterruptedException e) {
@@ -109,11 +114,10 @@ public class GameMain extends JPanel {
         }
 
         char[][] currentBoardState = getBoardAsCharArray();
-        int[] aiMove = aiPlayer.getBotMove(currentBoardState); // Panggil getBotMove dari kelas Bot
+        int[] aiMove = aiPlayer.getBotMove(currentBoardState);
         int row = aiMove[0];
         int col = aiMove[1];
 
-        // Pastikan langkah AI valid sebelum melangkah
         if (row != -1 && col != -1 && board.cells[row][col].content == Seed.NO_SEED) {
             currentState = board.stepGame(currentPlayer, row, col);
             if (currentState == State.PLAYING) {
@@ -121,14 +125,9 @@ public class GameMain extends JPanel {
             } else {
                 SoundEffect.DIE.play();
             }
-            currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS; // Ganti pemain kembali ke manusia (X)
+            currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
         } else {
-            // Ini bisa terjadi jika papan penuh (DRAW) atau AI mengembalikan langkah yang tidak valid
             System.err.println("AI returned an invalid move or board is full. AI Move: [" + row + ", " + col + "]");
-            // Jika AI mengembalikan langkah tidak valid, game tetap bisa dilanjutkan,
-            // tetapi ini menunjukkan potensi bug dalam logika AI Anda.
-            // Untuk sementara, kita bisa memastikan pergantian giliran tetap terjadi
-            // agar game tidak stuck.
             currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
         }
         repaint();
@@ -159,13 +158,12 @@ public class GameMain extends JPanel {
 
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
-            // Sesuaikan pesan status bar berdasarkan mode permainan
             if (gameMode == GameMode.PLAYER_VS_PLAYER) {
                 statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
-            } else { // Player vs Bot
+            } else {
                 if (currentPlayer == Seed.CROSS) {
                     statusBar.setText("X's Turn (Your Turn)");
-                } else { // Giliran AI (Nought)
+                } else {
                     statusBar.setText("AI (O) is thinking...");
                 }
             }
@@ -177,7 +175,6 @@ public class GameMain extends JPanel {
             statusBar.setText("'X' Won! Click to play again.");
         } else if (currentState == State.NOUGHT_WON) {
             statusBar.setForeground(Color.RED);
-            // Sesuaikan pesan kemenangan untuk AI
             if (gameMode == GameMode.PLAYER_VS_BOT) {
                 statusBar.setText("AI (O) Won! Click to play again.");
             } else {
@@ -189,15 +186,13 @@ public class GameMain extends JPanel {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Tampilkan login GUI
                 if (!showLoginDialog()) {
-                    System.exit(0); // Tutup jika login batal
+                    System.exit(0);
                 }
 
-                // Tampilkan pilihan mode permainan
-                showGameModeDialog();
+                // Tampilkan pilihan mode permainan dan tingkat kesulitan
+                showGameModeAndDifficultyDialog();
 
-                // Buka game
                 JFrame frame = new JFrame(TITLE);
                 frame.setContentPane(new GameMain());
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -255,9 +250,8 @@ public class GameMain extends JPanel {
         PLAYER_VS_BOT
     }
 
-    private static GameMode gameMode; // Tidak lagi final, karena nilainya ditentukan oleh dialog
+    private static GameMode gameMode;
 
-    /** Tampilkan dialog login GUI */
     private static boolean showLoginDialog() throws ClassNotFoundException {
         JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
         JLabel userLabel = new JLabel("Username:");
@@ -279,7 +273,7 @@ public class GameMain extends JPanel {
                     JOptionPane.PLAIN_MESSAGE
             );
             if (option != JOptionPane.OK_OPTION) {
-                return false; // Batal
+                return false;
             }
 
             String uName = userField.getText().trim();
@@ -299,24 +293,61 @@ public class GameMain extends JPanel {
         }
     }
 
-    /** Tampilkan dialog pemilihan mode permainan */
-    private static void showGameModeDialog() {
-        String[] options = {"Player vs Player", "Player vs Bot"};
-        int choice = JOptionPane.showOptionDialog(
+    /**
+     * Menampilkan dialog pemilihan mode permainan dan tingkat kesulitan AI.
+     */
+    private static void showGameModeAndDifficultyDialog() {
+        String[] gameModeOptions = {"Player vs Player", "Player vs Bot"};
+        int gameModeChoice = JOptionPane.showOptionDialog(
                 null,
                 "Pilih Mode Permainan:",
                 "Mode Permainan",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                options,
-                options[0]
+                gameModeOptions,
+                gameModeOptions[0]
         );
 
-        if (choice == 0) {
+        if (gameModeChoice == 0) {
             gameMode = GameMode.PLAYER_VS_PLAYER;
-        } else if (choice == 1) {
+        } else if (gameModeChoice == 1) {
             gameMode = GameMode.PLAYER_VS_BOT;
+
+            // Pilihan tingkat kesulitan AI
+            String[] difficultyOptions = {"Easy", "Medium", "Hard"};
+            JComboBox<String> difficultyComboBox = new JComboBox<>(difficultyOptions);
+
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Pilih Tingkat Kesulitan AI:"));
+            panel.add(difficultyComboBox);
+
+            int result = JOptionPane.showConfirmDialog(
+                    null,
+                    panel,
+                    "Pilih Tingkat Kesulitan AI",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                String selectedDifficulty = (String) difficultyComboBox.getSelectedItem();
+                // Set tingkat kesulitan AI berdasarkan pilihan
+                switch (selectedDifficulty) {
+                    case "Easy":
+                        aiDifficulty = AIDifficulty.EASY;
+                        break;
+                    case "Medium":
+                        aiDifficulty = AIDifficulty.MEDIUM;
+                        break;
+                    case "Hard":
+                        aiDifficulty = AIDifficulty.HARD;
+                        break;
+                    default:
+                        aiDifficulty = AIDifficulty.EASY; // Default
+                }
+            } else {
+                System.exit(0); // Cancel
+            }
         } else {
             System.exit(0); // Cancel
         }
