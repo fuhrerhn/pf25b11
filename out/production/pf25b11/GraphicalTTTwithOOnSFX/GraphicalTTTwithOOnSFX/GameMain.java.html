@@ -1,0 +1,377 @@
+<html>
+<head>
+<title>GameMain.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #2aacb8;}
+.s4 { color: #6aab73;}
+.s5 { color: #7a7e85;}
+.s6 { color: #5f826b; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+GameMain.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">GraphicalTTTwithOOnSFX</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">javax</span><span class="s2">.</span><span class="s1">swing</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.</span><span class="s1">event</span><span class="s2">.</span><span class="s1">MouseAdapter</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.</span><span class="s1">event</span><span class="s2">.</span><span class="s1">MouseEvent</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">sql</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">concurrent</span><span class="s2">.</span><span class="s1">TimeUnit</span><span class="s2">;</span>
+
+<span class="s0">public class </span><span class="s1">GameMain </span><span class="s0">extends </span><span class="s1">JPanel </span><span class="s2">{</span>
+    <span class="s0">private static final long </span><span class="s1">serialVersionUID </span><span class="s2">= </span><span class="s3">1L</span><span class="s2">;</span>
+
+    <span class="s0">public static final </span><span class="s1">String TITLE </span><span class="s2">= </span><span class="s4">&quot;Tic Tac Toe&quot;</span><span class="s2">;</span>
+    <span class="s0">public static final </span><span class="s1">Color COLOR_BG </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">);</span>
+    <span class="s0">public static final </span><span class="s1">Color COLOR_BG_STATUS </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s3">202</span><span class="s2">, </span><span class="s3">202</span><span class="s2">, </span><span class="s3">202</span><span class="s2">);</span>
+    <span class="s0">public static final </span><span class="s1">Color COLOR_CROSS </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s3">239</span><span class="s2">, </span><span class="s3">105</span><span class="s2">, </span><span class="s3">80</span><span class="s2">);</span>
+    <span class="s0">public static final </span><span class="s1">Color COLOR_NOUGHT </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Color</span><span class="s2">(</span><span class="s3">64</span><span class="s2">, </span><span class="s3">154</span><span class="s2">, </span><span class="s3">225</span><span class="s2">);</span>
+    <span class="s0">public static final </span><span class="s1">Font FONT_STATUS </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Font</span><span class="s2">(</span><span class="s4">&quot;OCR A Extended&quot;</span><span class="s2">, </span><span class="s1">Font</span><span class="s2">.</span><span class="s1">PLAIN</span><span class="s2">, </span><span class="s3">14</span><span class="s2">);</span>
+
+    <span class="s0">private </span><span class="s1">Board board</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">State currentState</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">Seed currentPlayer</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">JLabel statusBar</span><span class="s2">;</span>
+
+    <span class="s5">// Tambahkan deklarasi untuk Bot dan tingkat kesulitan</span>
+    <span class="s0">private </span><span class="s1">Bot aiPlayer</span><span class="s2">;</span>
+    <span class="s0">private char </span><span class="s1">humanPlayerChar </span><span class="s2">= </span><span class="s4">'X'</span><span class="s2">;</span>
+    <span class="s0">private char </span><span class="s1">aiPlayerChar </span><span class="s2">= </span><span class="s4">'O'</span><span class="s2">;</span>
+    <span class="s0">private static </span><span class="s1">AIDifficulty aiDifficulty </span><span class="s2">= </span><span class="s1">AIDifficulty</span><span class="s2">.</span><span class="s1">EASY</span><span class="s2">; </span><span class="s5">// Default ke EASY</span>
+
+    <span class="s5">// Enum untuk tingkat kesulitan AI</span>
+    <span class="s0">public enum </span><span class="s1">AIDifficulty </span><span class="s2">{</span>
+        <span class="s1">EASY</span><span class="s2">,</span>
+        <span class="s1">MEDIUM</span><span class="s2">,</span>
+        <span class="s1">HARD</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">GameMain</span><span class="s2">() {</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">addMouseListener</span><span class="s2">(</span><span class="s0">new </span><span class="s1">MouseAdapter</span><span class="s2">() {</span>
+            <span class="s1">@Override</span>
+            <span class="s0">public void </span><span class="s1">mouseClicked</span><span class="s2">(</span><span class="s1">MouseEvent e</span><span class="s2">) {</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">) {</span>
+                    <span class="s0">if </span><span class="s2">(</span><span class="s1">gameMode </span><span class="s2">== </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_PLAYER </span><span class="s2">|| (</span><span class="s1">gameMode </span><span class="s2">== </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_BOT </span><span class="s2">&amp;&amp; </span><span class="s1">currentPlayer </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">)) {</span>
+                        <span class="s0">int </span><span class="s1">mouseX </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getX</span><span class="s2">();</span>
+                        <span class="s0">int </span><span class="s1">mouseY </span><span class="s2">= </span><span class="s1">e</span><span class="s2">.</span><span class="s1">getY</span><span class="s2">();</span>
+                        <span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s1">mouseY </span><span class="s2">/ </span><span class="s1">Cell</span><span class="s2">.</span><span class="s1">SIZE</span><span class="s2">;</span>
+                        <span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s1">mouseX </span><span class="s2">/ </span><span class="s1">Cell</span><span class="s2">.</span><span class="s1">SIZE</span><span class="s2">;</span>
+
+                        <span class="s0">if </span><span class="s2">(</span><span class="s1">row </span><span class="s2">&gt;= </span><span class="s3">0 </span><span class="s2">&amp;&amp; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">ROWS </span><span class="s2">&amp;&amp; </span><span class="s1">col </span><span class="s2">&gt;= </span><span class="s3">0 </span><span class="s2">&amp;&amp; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">COLS</span>
+                                <span class="s2">&amp;&amp; </span><span class="s1">board</span><span class="s2">.</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NO_SEED</span><span class="s2">) {</span>
+                            <span class="s1">currentState </span><span class="s2">= </span><span class="s1">board</span><span class="s2">.</span><span class="s1">stepGame</span><span class="s2">(</span><span class="s1">currentPlayer</span><span class="s2">, </span><span class="s1">row</span><span class="s2">, </span><span class="s1">col</span><span class="s2">);</span>
+                            <span class="s0">if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">) {</span>
+                                <span class="s1">SoundEffect</span><span class="s2">.</span><span class="s1">EAT_FOOD</span><span class="s2">.</span><span class="s1">play</span><span class="s2">();</span>
+                            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                                <span class="s1">SoundEffect</span><span class="s2">.</span><span class="s1">DIE</span><span class="s2">.</span><span class="s1">play</span><span class="s2">();</span>
+                            <span class="s2">}</span>
+                            <span class="s1">currentPlayer </span><span class="s2">= (</span><span class="s1">currentPlayer </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) ? </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NOUGHT </span><span class="s2">: </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">;</span>
+
+                            <span class="s0">if </span><span class="s2">(</span><span class="s1">gameMode </span><span class="s2">== </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_BOT </span><span class="s2">&amp;&amp; </span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">) {</span>
+                                <span class="s1">makeAIMove</span><span class="s2">();</span>
+                            <span class="s2">}</span>
+                        <span class="s2">}</span>
+                    <span class="s2">}</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">newGame</span><span class="s2">();</span>
+                <span class="s2">}</span>
+                <span class="s1">repaint</span><span class="s2">();</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+
+        <span class="s1">statusBar </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">();</span>
+        <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setFont</span><span class="s2">(</span><span class="s1">FONT_STATUS</span><span class="s2">);</span>
+        <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setBackground</span><span class="s2">(</span><span class="s1">COLOR_BG_STATUS</span><span class="s2">);</span>
+        <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setOpaque</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setPreferredSize</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Dimension</span><span class="s2">(</span><span class="s3">300</span><span class="s2">, </span><span class="s3">30</span><span class="s2">));</span>
+        <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setHorizontalAlignment</span><span class="s2">(</span><span class="s1">JLabel</span><span class="s2">.</span><span class="s1">LEFT</span><span class="s2">);</span>
+        <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createEmptyBorder</span><span class="s2">(</span><span class="s3">5</span><span class="s2">, </span><span class="s3">10</span><span class="s2">, </span><span class="s3">5</span><span class="s2">, </span><span class="s3">12</span><span class="s2">));</span>
+
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">setLayout</span><span class="s2">(</span><span class="s0">new </span><span class="s1">BorderLayout</span><span class="s2">());</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">statusBar</span><span class="s2">, </span><span class="s1">BorderLayout</span><span class="s2">.</span><span class="s1">PAGE_END</span><span class="s2">);</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">setPreferredSize</span><span class="s2">(</span><span class="s0">new </span><span class="s1">Dimension</span><span class="s2">(</span><span class="s1">Board</span><span class="s2">.</span><span class="s1">CANVAS_WIDTH</span><span class="s2">, </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">CANVAS_HEIGHT </span><span class="s2">+ </span><span class="s3">30</span><span class="s2">));</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">setBorder</span><span class="s2">(</span><span class="s1">BorderFactory</span><span class="s2">.</span><span class="s1">createLineBorder</span><span class="s2">(</span><span class="s1">COLOR_BG_STATUS</span><span class="s2">, </span><span class="s3">2</span><span class="s2">, </span><span class="s0">false</span><span class="s2">));</span>
+
+        <span class="s1">initGame</span><span class="s2">();</span>
+        <span class="s1">newGame</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">initGame</span><span class="s2">() {</span>
+        <span class="s1">board </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Board</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">newGame</span><span class="s2">() {</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">row </span><span class="s2">&lt; </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">ROWS</span><span class="s2">; ++</span><span class="s1">row</span><span class="s2">) {</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">col </span><span class="s2">&lt; </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">COLS</span><span class="s2">; ++</span><span class="s1">col</span><span class="s2">) {</span>
+                <span class="s1">board</span><span class="s2">.</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">].</span><span class="s1">content </span><span class="s2">= </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NO_SEED</span><span class="s2">;</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+        <span class="s1">currentPlayer </span><span class="s2">= </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">;</span>
+        <span class="s1">currentState </span><span class="s2">= </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">;</span>
+
+        <span class="s5">// Inisialisasi Bot dengan tingkat kesulitan yang dipilih</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">gameMode </span><span class="s2">== </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_BOT</span><span class="s2">) {</span>
+            <span class="s1">aiPlayer </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Bot</span><span class="s2">(</span><span class="s1">aiPlayerChar</span><span class="s2">, </span><span class="s1">humanPlayerChar</span><span class="s2">, </span><span class="s1">aiDifficulty</span><span class="s2">);</span>
+        <span class="s2">}</span>
+        <span class="s1">repaint</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private void </span><span class="s1">makeAIMove</span><span class="s2">() {</span>
+        <span class="s0">try </span><span class="s2">{</span>
+            <span class="s1">TimeUnit</span><span class="s2">.</span><span class="s1">MILLISECONDS</span><span class="s2">.</span><span class="s1">sleep</span><span class="s2">(</span><span class="s3">500</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">InterruptedException e</span><span class="s2">) {</span>
+            <span class="s1">Thread</span><span class="s2">.</span><span class="s1">currentThread</span><span class="s2">().</span><span class="s1">interrupt</span><span class="s2">();</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s4">&quot;AI thinking interrupted.&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s0">char</span><span class="s2">[][] </span><span class="s1">currentBoardState </span><span class="s2">= </span><span class="s1">getBoardAsCharArray</span><span class="s2">();</span>
+        <span class="s0">int</span><span class="s2">[] </span><span class="s1">aiMove </span><span class="s2">= </span><span class="s1">aiPlayer</span><span class="s2">.</span><span class="s1">getBotMove</span><span class="s2">(</span><span class="s1">currentBoardState</span><span class="s2">);</span>
+        <span class="s0">int </span><span class="s1">row </span><span class="s2">= </span><span class="s1">aiMove</span><span class="s2">[</span><span class="s3">0</span><span class="s2">];</span>
+        <span class="s0">int </span><span class="s1">col </span><span class="s2">= </span><span class="s1">aiMove</span><span class="s2">[</span><span class="s3">1</span><span class="s2">];</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">row </span><span class="s2">!= -</span><span class="s3">1 </span><span class="s2">&amp;&amp; </span><span class="s1">col </span><span class="s2">!= -</span><span class="s3">1 </span><span class="s2">&amp;&amp; </span><span class="s1">board</span><span class="s2">.</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">row</span><span class="s2">][</span><span class="s1">col</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NO_SEED</span><span class="s2">) {</span>
+            <span class="s1">currentState </span><span class="s2">= </span><span class="s1">board</span><span class="s2">.</span><span class="s1">stepGame</span><span class="s2">(</span><span class="s1">currentPlayer</span><span class="s2">, </span><span class="s1">row</span><span class="s2">, </span><span class="s1">col</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">) {</span>
+                <span class="s1">SoundEffect</span><span class="s2">.</span><span class="s1">EAT_FOOD</span><span class="s2">.</span><span class="s1">play</span><span class="s2">();</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s1">SoundEffect</span><span class="s2">.</span><span class="s1">DIE</span><span class="s2">.</span><span class="s1">play</span><span class="s2">();</span>
+            <span class="s2">}</span>
+            <span class="s1">currentPlayer </span><span class="s2">= (</span><span class="s1">currentPlayer </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) ? </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NOUGHT </span><span class="s2">: </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">;</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s4">&quot;AI returned an invalid move or board is full. AI Move: [&quot; </span><span class="s2">+ </span><span class="s1">row </span><span class="s2">+ </span><span class="s4">&quot;, &quot; </span><span class="s2">+ </span><span class="s1">col </span><span class="s2">+ </span><span class="s4">&quot;]&quot;</span><span class="s2">);</span>
+            <span class="s1">currentPlayer </span><span class="s2">= (</span><span class="s1">currentPlayer </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) ? </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NOUGHT </span><span class="s2">: </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">;</span>
+        <span class="s2">}</span>
+        <span class="s1">repaint</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private char</span><span class="s2">[][] </span><span class="s1">getBoardAsCharArray</span><span class="s2">() {</span>
+        <span class="s0">char</span><span class="s2">[][] </span><span class="s1">charBoard </span><span class="s2">= </span><span class="s0">new char</span><span class="s2">[</span><span class="s1">Board</span><span class="s2">.</span><span class="s1">ROWS</span><span class="s2">][</span><span class="s1">Board</span><span class="s2">.</span><span class="s1">COLS</span><span class="s2">];</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">r </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">r </span><span class="s2">&lt; </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">ROWS</span><span class="s2">; </span><span class="s1">r</span><span class="s2">++) {</span>
+            <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">c </span><span class="s2">= </span><span class="s3">0</span><span class="s2">; </span><span class="s1">c </span><span class="s2">&lt; </span><span class="s1">Board</span><span class="s2">.</span><span class="s1">COLS</span><span class="s2">; </span><span class="s1">c</span><span class="s2">++) {</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">board</span><span class="s2">.</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">r</span><span class="s2">][</span><span class="s1">c</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NO_SEED</span><span class="s2">) {</span>
+                    <span class="s1">charBoard</span><span class="s2">[</span><span class="s1">r</span><span class="s2">][</span><span class="s1">c</span><span class="s2">] = </span><span class="s4">'-'</span><span class="s2">;</span>
+                <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">board</span><span class="s2">.</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">r</span><span class="s2">][</span><span class="s1">c</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) {</span>
+                    <span class="s1">charBoard</span><span class="s2">[</span><span class="s1">r</span><span class="s2">][</span><span class="s1">c</span><span class="s2">] = </span><span class="s4">'X'</span><span class="s2">;</span>
+                <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">board</span><span class="s2">.</span><span class="s1">cells</span><span class="s2">[</span><span class="s1">r</span><span class="s2">][</span><span class="s1">c</span><span class="s2">].</span><span class="s1">content </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">NOUGHT</span><span class="s2">) {</span>
+                    <span class="s1">charBoard</span><span class="s2">[</span><span class="s1">r</span><span class="s2">][</span><span class="s1">c</span><span class="s2">] = </span><span class="s4">'O'</span><span class="s2">;</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+        <span class="s0">return </span><span class="s1">charBoard</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">paintComponent</span><span class="s2">(</span><span class="s1">Graphics g</span><span class="s2">) {</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">paintComponent</span><span class="s2">(</span><span class="s1">g</span><span class="s2">);</span>
+        <span class="s1">setBackground</span><span class="s2">(</span><span class="s1">COLOR_BG</span><span class="s2">);</span>
+
+        <span class="s1">board</span><span class="s2">.</span><span class="s1">paint</span><span class="s2">(</span><span class="s1">g</span><span class="s2">);</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">PLAYING</span><span class="s2">) {</span>
+            <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">BLACK</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">gameMode </span><span class="s2">== </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_PLAYER</span><span class="s2">) {</span>
+                <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">((</span><span class="s1">currentPlayer </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) ? </span><span class="s4">&quot;X's Turn&quot; </span><span class="s2">: </span><span class="s4">&quot;O's Turn&quot;</span><span class="s2">);</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">currentPlayer </span><span class="s2">== </span><span class="s1">Seed</span><span class="s2">.</span><span class="s1">CROSS</span><span class="s2">) {</span>
+                    <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s4">&quot;X's Turn (Your Turn)&quot;</span><span class="s2">);</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s4">&quot;AI (O) is thinking...&quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">DRAW</span><span class="s2">) {</span>
+            <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">RED</span><span class="s2">);</span>
+            <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s4">&quot;It's a Draw! Click to play again.&quot;</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">CROSS_WON</span><span class="s2">) {</span>
+            <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">RED</span><span class="s2">);</span>
+            <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s4">&quot;'X' Won! Click to play again.&quot;</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">currentState </span><span class="s2">== </span><span class="s1">State</span><span class="s2">.</span><span class="s1">NOUGHT_WON</span><span class="s2">) {</span>
+            <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setForeground</span><span class="s2">(</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">RED</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">gameMode </span><span class="s2">== </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_BOT</span><span class="s2">) {</span>
+                <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s4">&quot;AI (O) Won! Click to play again.&quot;</span><span class="s2">);</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s1">statusBar</span><span class="s2">.</span><span class="s1">setText</span><span class="s2">(</span><span class="s4">&quot;'O' Won! Click to play again.&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public static void </span><span class="s1">main</span><span class="s2">(</span><span class="s1">String</span><span class="s2">[] </span><span class="s1">args</span><span class="s2">) {</span>
+        <span class="s1">SwingUtilities</span><span class="s2">.</span><span class="s1">invokeLater</span><span class="s2">(() </span><span class="s1">-&gt; </span><span class="s2">{</span>
+            <span class="s0">try </span><span class="s2">{</span>
+                <span class="s0">if </span><span class="s2">(!</span><span class="s1">showLoginDialog</span><span class="s2">()) {</span>
+                    <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s3">0</span><span class="s2">);</span>
+                <span class="s2">}</span>
+
+                <span class="s5">// Tampilkan pilihan mode permainan dan tingkat kesulitan</span>
+                <span class="s1">showGameModeAndDifficultyDialog</span><span class="s2">();</span>
+
+                <span class="s1">JFrame frame </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JFrame</span><span class="s2">(</span><span class="s1">TITLE</span><span class="s2">);</span>
+                <span class="s1">frame</span><span class="s2">.</span><span class="s1">setContentPane</span><span class="s2">(</span><span class="s0">new </span><span class="s1">GameMain</span><span class="s2">());</span>
+                <span class="s1">frame</span><span class="s2">.</span><span class="s1">setDefaultCloseOperation</span><span class="s2">(</span><span class="s1">JFrame</span><span class="s2">.</span><span class="s1">EXIT_ON_CLOSE</span><span class="s2">);</span>
+                <span class="s1">frame</span><span class="s2">.</span><span class="s1">pack</span><span class="s2">();</span>
+                <span class="s1">frame</span><span class="s2">.</span><span class="s1">setLocationRelativeTo</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+                <span class="s1">frame</span><span class="s2">.</span><span class="s1">setVisible</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+
+            <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">ClassNotFoundException e</span><span class="s2">) {</span>
+                <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span><span class="s0">null</span><span class="s2">,</span>
+                        <span class="s4">&quot;Terjadi kesalahan saat koneksi database. Pastikan driver JDBC MySQL sudah ditambahkan ke classpath.&quot;</span><span class="s2">,</span>
+                        <span class="s4">&quot;Error Koneksi Database&quot;</span><span class="s2">,</span>
+                        <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">ERROR_MESSAGE</span><span class="s2">);</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s3">1</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">});</span>
+    <span class="s2">}</span>
+
+    <span class="s0">static </span><span class="s1">String getPassword</span><span class="s2">(</span><span class="s1">String uName</span><span class="s2">) </span><span class="s0">throws </span><span class="s1">ClassNotFoundException </span><span class="s2">{</span>
+        <span class="s1">String pass </span><span class="s2">= </span><span class="s4">&quot;&quot;</span><span class="s2">;</span>
+        <span class="s1">String host </span><span class="s2">= </span><span class="s4">&quot;mysql-tictactoe-pf2511b.c.aivencloud.com&quot;</span><span class="s2">;</span>
+        <span class="s1">String port </span><span class="s2">= </span><span class="s4">&quot;23308&quot;</span><span class="s2">;</span>
+        <span class="s1">String databaseName </span><span class="s2">= </span><span class="s4">&quot;tictactoedb&quot;</span><span class="s2">;</span>
+        <span class="s1">String userName </span><span class="s2">= </span><span class="s4">&quot;avnadmin&quot;</span><span class="s2">;</span>
+        <span class="s1">String password </span><span class="s2">= </span><span class="s4">&quot;AVNS_yJalhq5JBAgd9LeEGxU&quot;</span><span class="s2">;</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">host </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">port </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">databaseName </span><span class="s2">== </span><span class="s0">null</span><span class="s2">) {</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s4">&quot;Host, port, or database information is missing.&quot;</span><span class="s2">);</span>
+            <span class="s0">return </span><span class="s4">&quot;&quot;</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+        <span class="s1">Class</span><span class="s2">.</span><span class="s1">forName</span><span class="s2">(</span><span class="s4">&quot;com.mysql.cj.jdbc.Driver&quot;</span><span class="s2">);</span>
+
+        <span class="s1">String sql </span><span class="s2">= </span><span class="s4">&quot;SELECT password FROM game_user WHERE username = ?&quot;</span><span class="s2">;</span>
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">Connection connection </span><span class="s2">= </span><span class="s1">DriverManager</span><span class="s2">.</span><span class="s1">getConnection</span><span class="s2">(</span>
+                <span class="s4">&quot;jdbc:mysql://&quot; </span><span class="s2">+ </span><span class="s1">host </span><span class="s2">+ </span><span class="s4">&quot;:&quot; </span><span class="s2">+ </span><span class="s1">port </span><span class="s2">+ </span><span class="s4">&quot;/&quot; </span><span class="s2">+ </span><span class="s1">databaseName </span><span class="s2">+ </span><span class="s4">&quot;?sslmode=require&quot;</span><span class="s2">,</span>
+                <span class="s1">userName</span><span class="s2">, </span><span class="s1">password</span><span class="s2">);</span>
+             <span class="s1">PreparedStatement pstmt </span><span class="s2">= </span><span class="s1">connection</span><span class="s2">.</span><span class="s1">prepareStatement</span><span class="s2">(</span><span class="s1">sql</span><span class="s2">)) {</span>
+
+            <span class="s1">pstmt</span><span class="s2">.</span><span class="s1">setString</span><span class="s2">(</span><span class="s3">1</span><span class="s2">, </span><span class="s1">uName</span><span class="s2">);</span>
+            <span class="s1">ResultSet resultSet </span><span class="s2">= </span><span class="s1">pstmt</span><span class="s2">.</span><span class="s1">executeQuery</span><span class="s2">();</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">resultSet</span><span class="s2">.</span><span class="s1">next</span><span class="s2">()) {</span>
+                <span class="s1">pass </span><span class="s2">= </span><span class="s1">resultSet</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s4">&quot;password&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">SQLException e</span><span class="s2">) {</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s4">&quot;SQL Exception during database connection or query:&quot;</span><span class="s2">);</span>
+            <span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s0">return </span><span class="s1">pass</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public enum </span><span class="s1">GameMode </span><span class="s2">{</span>
+        <span class="s1">PLAYER_VS_PLAYER</span><span class="s2">,</span>
+        <span class="s1">PLAYER_VS_BOT</span>
+    <span class="s2">}</span>
+
+    <span class="s0">private static </span><span class="s1">GameMode gameMode</span><span class="s2">;</span>
+
+    <span class="s0">private static boolean </span><span class="s1">showLoginDialog</span><span class="s2">() </span><span class="s0">throws </span><span class="s1">ClassNotFoundException </span><span class="s2">{</span>
+        <span class="s1">JPanel panel </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JPanel</span><span class="s2">(</span><span class="s0">new </span><span class="s1">GridLayout</span><span class="s2">(</span><span class="s3">2</span><span class="s2">, </span><span class="s3">2</span><span class="s2">, </span><span class="s3">5</span><span class="s2">, </span><span class="s3">5</span><span class="s2">));</span>
+        <span class="s1">JLabel userLabel </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s4">&quot;Username:&quot;</span><span class="s2">);</span>
+        <span class="s1">JTextField userField </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JTextField</span><span class="s2">(</span><span class="s3">15</span><span class="s2">);</span>
+        <span class="s1">JLabel passLabel </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s4">&quot;Password:&quot;</span><span class="s2">);</span>
+        <span class="s1">JPasswordField passField </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JPasswordField</span><span class="s2">(</span><span class="s3">15</span><span class="s2">);</span>
+
+        <span class="s1">panel</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">userLabel</span><span class="s2">);</span>
+        <span class="s1">panel</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">userField</span><span class="s2">);</span>
+        <span class="s1">panel</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">passLabel</span><span class="s2">);</span>
+        <span class="s1">panel</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">passField</span><span class="s2">);</span>
+
+        <span class="s0">while </span><span class="s2">(</span><span class="s0">true</span><span class="s2">) {</span>
+            <span class="s0">int </span><span class="s1">option </span><span class="s2">= </span><span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showConfirmDialog</span><span class="s2">(</span>
+                    <span class="s0">null</span><span class="s2">,</span>
+                    <span class="s1">panel</span><span class="s2">,</span>
+                    <span class="s4">&quot;Login Tic Tac Toe&quot;</span><span class="s2">,</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">OK_CANCEL_OPTION</span><span class="s2">,</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">PLAIN_MESSAGE</span>
+            <span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">option </span><span class="s2">!= </span><span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">OK_OPTION</span><span class="s2">) {</span>
+                <span class="s0">return false</span><span class="s2">;</span>
+            <span class="s2">}</span>
+
+            <span class="s1">String uName </span><span class="s2">= </span><span class="s1">userField</span><span class="s2">.</span><span class="s1">getText</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">();</span>
+            <span class="s1">String pass </span><span class="s2">= </span><span class="s0">new </span><span class="s1">String</span><span class="s2">(</span><span class="s1">passField</span><span class="s2">.</span><span class="s1">getPassword</span><span class="s2">());</span>
+
+            <span class="s1">String truePass </span><span class="s2">= </span><span class="s1">getPassword</span><span class="s2">(</span><span class="s1">uName</span><span class="s2">);</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">pass</span><span class="s2">.</span><span class="s1">equals</span><span class="s2">(</span><span class="s1">truePass</span><span class="s2">)) {</span>
+                <span class="s0">return true</span><span class="s2">;</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showMessageDialog</span><span class="s2">(</span>
+                        <span class="s0">null</span><span class="s2">,</span>
+                        <span class="s4">&quot;Username atau password salah.</span><span class="s0">\n</span><span class="s4">Silakan coba lagi.&quot;</span><span class="s2">,</span>
+                        <span class="s4">&quot;Login Gagal&quot;</span><span class="s2">,</span>
+                        <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">ERROR_MESSAGE</span>
+                <span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s6">/**</span>
+     <span class="s6">* Menampilkan dialog pemilihan mode permainan dan tingkat kesulitan AI.</span>
+     <span class="s6">*/</span>
+    <span class="s0">private static void </span><span class="s1">showGameModeAndDifficultyDialog</span><span class="s2">() {</span>
+        <span class="s1">String</span><span class="s2">[] </span><span class="s1">gameModeOptions </span><span class="s2">= {</span><span class="s4">&quot;Player vs Player&quot;</span><span class="s2">, </span><span class="s4">&quot;Player vs Bot&quot;</span><span class="s2">};</span>
+        <span class="s0">int </span><span class="s1">gameModeChoice </span><span class="s2">= </span><span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showOptionDialog</span><span class="s2">(</span>
+                <span class="s0">null</span><span class="s2">,</span>
+                <span class="s4">&quot;Pilih Mode Permainan:&quot;</span><span class="s2">,</span>
+                <span class="s4">&quot;Mode Permainan&quot;</span><span class="s2">,</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">DEFAULT_OPTION</span><span class="s2">,</span>
+                <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">QUESTION_MESSAGE</span><span class="s2">,</span>
+                <span class="s0">null</span><span class="s2">,</span>
+                <span class="s1">gameModeOptions</span><span class="s2">,</span>
+                <span class="s1">gameModeOptions</span><span class="s2">[</span><span class="s3">0</span><span class="s2">]</span>
+        <span class="s2">);</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">gameModeChoice </span><span class="s2">== </span><span class="s3">0</span><span class="s2">) {</span>
+            <span class="s1">gameMode </span><span class="s2">= </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_PLAYER</span><span class="s2">;</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">gameModeChoice </span><span class="s2">== </span><span class="s3">1</span><span class="s2">) {</span>
+            <span class="s1">gameMode </span><span class="s2">= </span><span class="s1">GameMode</span><span class="s2">.</span><span class="s1">PLAYER_VS_BOT</span><span class="s2">;</span>
+
+            <span class="s5">// Pilihan tingkat kesulitan AI</span>
+            <span class="s1">String</span><span class="s2">[] </span><span class="s1">difficultyOptions </span><span class="s2">= {</span><span class="s4">&quot;Easy&quot;</span><span class="s2">, </span><span class="s4">&quot;Medium&quot;</span><span class="s2">, </span><span class="s4">&quot;Hard&quot;</span><span class="s2">};</span>
+            <span class="s1">JComboBox</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">difficultyComboBox </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JComboBox</span><span class="s2">&lt;&gt;(</span><span class="s1">difficultyOptions</span><span class="s2">);</span>
+
+            <span class="s1">JPanel panel </span><span class="s2">= </span><span class="s0">new </span><span class="s1">JPanel</span><span class="s2">(</span><span class="s0">new </span><span class="s1">GridLayout</span><span class="s2">(</span><span class="s3">0</span><span class="s2">, </span><span class="s3">1</span><span class="s2">));</span>
+            <span class="s1">panel</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s0">new </span><span class="s1">JLabel</span><span class="s2">(</span><span class="s4">&quot;Pilih Tingkat Kesulitan AI:&quot;</span><span class="s2">));</span>
+            <span class="s1">panel</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">difficultyComboBox</span><span class="s2">);</span>
+
+            <span class="s0">int </span><span class="s1">result </span><span class="s2">= </span><span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">showConfirmDialog</span><span class="s2">(</span>
+                    <span class="s0">null</span><span class="s2">,</span>
+                    <span class="s1">panel</span><span class="s2">,</span>
+                    <span class="s4">&quot;Pilih Tingkat Kesulitan AI&quot;</span><span class="s2">,</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">OK_CANCEL_OPTION</span><span class="s2">,</span>
+                    <span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">QUESTION_MESSAGE</span><span class="s2">);</span>
+
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">result </span><span class="s2">== </span><span class="s1">JOptionPane</span><span class="s2">.</span><span class="s1">OK_OPTION</span><span class="s2">) {</span>
+                <span class="s1">String selectedDifficulty </span><span class="s2">= (</span><span class="s1">String</span><span class="s2">) </span><span class="s1">difficultyComboBox</span><span class="s2">.</span><span class="s1">getSelectedItem</span><span class="s2">();</span>
+                <span class="s5">// Set tingkat kesulitan AI berdasarkan pilihan</span>
+                <span class="s0">switch </span><span class="s2">(</span><span class="s1">selectedDifficulty</span><span class="s2">) {</span>
+                    <span class="s0">case </span><span class="s4">&quot;Easy&quot;</span><span class="s2">:</span>
+                        <span class="s1">aiDifficulty </span><span class="s2">= </span><span class="s1">AIDifficulty</span><span class="s2">.</span><span class="s1">EASY</span><span class="s2">;</span>
+                        <span class="s0">break</span><span class="s2">;</span>
+                    <span class="s0">case </span><span class="s4">&quot;Medium&quot;</span><span class="s2">:</span>
+                        <span class="s1">aiDifficulty </span><span class="s2">= </span><span class="s1">AIDifficulty</span><span class="s2">.</span><span class="s1">MEDIUM</span><span class="s2">;</span>
+                        <span class="s0">break</span><span class="s2">;</span>
+                    <span class="s0">case </span><span class="s4">&quot;Hard&quot;</span><span class="s2">:</span>
+                        <span class="s1">aiDifficulty </span><span class="s2">= </span><span class="s1">AIDifficulty</span><span class="s2">.</span><span class="s1">HARD</span><span class="s2">;</span>
+                        <span class="s0">break</span><span class="s2">;</span>
+                    <span class="s0">default</span><span class="s2">:</span>
+                        <span class="s1">aiDifficulty </span><span class="s2">= </span><span class="s1">AIDifficulty</span><span class="s2">.</span><span class="s1">EASY</span><span class="s2">; </span><span class="s5">// Default</span>
+                <span class="s2">}</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s3">0</span><span class="s2">); </span><span class="s5">// Cancel</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s3">0</span><span class="s2">); </span><span class="s5">// Cancel</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>

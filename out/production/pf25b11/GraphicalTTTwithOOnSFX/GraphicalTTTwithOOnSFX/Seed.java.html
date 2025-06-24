@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>Seed.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #5f826b; font-style: italic;}
+.s4 { color: #7a7e85;}
+.s5 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Seed.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">GraphicalTTTwithOOnSFX</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.</span><span class="s1">Image</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">net</span><span class="s2">.</span><span class="s1">URL</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">javax</span><span class="s2">.</span><span class="s1">swing</span><span class="s2">.</span><span class="s1">ImageIcon</span><span class="s2">;</span>
+<span class="s3">/**</span>
+ <span class="s3">* This enum is used by:</span>
+ <span class="s3">* 1. Player: takes value of CROSS or NOUGHT</span>
+ <span class="s3">* 2. Cell content: takes value of CROSS, NOUGHT, or NO_SEED.</span>
+ <span class="s3">*</span>
+ <span class="s3">* We also attach a display image icon (text or image) for the items.</span>
+ <span class="s3">*   and define the related variable/constructor/getter.</span>
+ <span class="s3">* To draw the image:</span>
+ <span class="s3">*   g.drawImage(content.getImage(), x, y, width, height, null);</span>
+ <span class="s3">*</span>
+ <span class="s3">* Ideally, we should define two enums with inheritance, which is,</span>
+ <span class="s3">*  however, not supported.</span>
+ <span class="s3">*/</span>
+<span class="s0">public enum </span><span class="s1">Seed </span><span class="s2">{   </span><span class="s4">// to save as &quot;Seed.java&quot;</span>
+    <span class="s1">CROSS</span><span class="s2">(</span><span class="s5">&quot;X&quot;</span><span class="s2">, </span><span class="s5">&quot;GraphicalTTTwithOOnSFX/images/cross.png&quot;</span><span class="s2">),   </span><span class="s4">// displayName, imageFilename</span>
+    <span class="s1">NOUGHT</span><span class="s2">(</span><span class="s5">&quot;O&quot;</span><span class="s2">, </span><span class="s5">&quot;GraphicalTTTwithOOnSFX/images/not.png&quot;</span><span class="s2">),</span>
+    <span class="s1">NO_SEED</span><span class="s2">(</span><span class="s5">&quot; &quot;</span><span class="s2">, </span><span class="s0">null</span><span class="s2">);</span>
+
+    <span class="s4">// Private variables</span>
+    <span class="s0">private </span><span class="s1">String displayName</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">Image img </span><span class="s2">= </span><span class="s0">null</span><span class="s2">;</span>
+
+    <span class="s4">// Constructor (must be private)</span>
+    <span class="s0">private </span><span class="s1">Seed</span><span class="s2">(</span><span class="s1">String name</span><span class="s2">, </span><span class="s1">String imageFilename</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">displayName </span><span class="s2">= </span><span class="s1">name</span><span class="s2">;</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">imageFilename </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">) {</span>
+            <span class="s1">URL imgURL </span><span class="s2">= </span><span class="s1">getClass</span><span class="s2">().</span><span class="s1">getClassLoader</span><span class="s2">().</span><span class="s1">getResource</span><span class="s2">(</span><span class="s1">imageFilename</span><span class="s2">);</span>
+            <span class="s1">ImageIcon icon </span><span class="s2">= </span><span class="s0">null</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">imgURL </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">) {</span>
+                <span class="s1">icon </span><span class="s2">= </span><span class="s0">new </span><span class="s1">ImageIcon</span><span class="s2">(</span><span class="s1">imgURL</span><span class="s2">);</span>
+                <span class="s4">//System.out.println(icon);  // debugging</span>
+                <span class="s1">img </span><span class="s2">= </span><span class="s1">icon</span><span class="s2">.</span><span class="s1">getImage</span><span class="s2">();</span>
+            <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s5">&quot;Couldn't find file &quot; </span><span class="s2">+ </span><span class="s1">imageFilename</span><span class="s2">);</span>
+            <span class="s2">}</span>
+            <span class="s1">img </span><span class="s2">= </span><span class="s1">icon</span><span class="s2">.</span><span class="s1">getImage</span><span class="s2">();</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s4">// Public getters</span>
+    <span class="s0">public </span><span class="s1">String getDisplayName</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">displayName</span><span class="s2">;</span>
+    <span class="s2">}</span>
+    <span class="s0">public </span><span class="s1">Image getImage</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">img</span><span class="s2">;</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+
+</pre>
+</body>
+</html>

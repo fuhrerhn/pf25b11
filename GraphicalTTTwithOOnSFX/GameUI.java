@@ -1,0 +1,77 @@
+package GraphicalTTTwithOOnSFX;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
+
+public class GameUI extends JPanel {
+    private static final long serialVersionUID = 1L;
+
+    public static final Color COLOR_BG = new Color(0, 0, 0);
+    public static final Color COLOR_BG_STATUS = new Color(202, 202, 202);
+    public static final Color COLOR_CROSS = new Color(239, 105, 80);
+    public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
+    public static final Font FONT_STATUS = new Font("OCR A Extended", Font.PLAIN, 14);
+    public static final Font FONT_GAMEOVER = new Font("Arial", Font.BOLD, 36);
+
+    private GameLogic gameLogic;
+
+    public GameUI(GameLogic gameLogic) {
+        this.gameLogic = gameLogic;
+        // Hapus penambahan statusBar di sini, karena akan ditambahkan di GameMain
+        setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); // Hanya ukuran papan
+        setBackground(COLOR_BG);
+        setFocusable(true);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Delegasikan penanganan klik ke GameLogic
+                gameLogic.handleMouseClick(e);
+                repaint(); // Minta UI untuk menggambar ulang setelah setiap klik
+            }
+        });
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Draw the board
+        gameLogic.getBoard().paint(g2d);
+
+        // Draw game over screen if game has ended
+        if (gameLogic.getCurrentState() != State.PLAYING && gameLogic.getCurrentState() != State.WAITING) { // Jangan tampilkan saat WAITING
+            drawGameOverScreen(g2d);
+        }
+    }
+
+    private void drawGameOverScreen(Graphics2D g2d) {
+        g2d.setColor(new Color(0, 0, 0, 150));
+        g2d.fillRect(0, 0, Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT);
+
+        String message = "";
+        Color textColor = Color.WHITE;
+
+        if (gameLogic.getCurrentState() == State.CROSS_WON) {
+            message = "X Menang!";
+            textColor = COLOR_CROSS;
+        } else if (gameLogic.getCurrentState() == State.NOUGHT_WON) {
+            message = "O Menang!";
+            textColor = COLOR_NOUGHT;
+        } else if (gameLogic.getCurrentState() == State.DRAW) {
+            message = "Seri!";
+            textColor = Color.WHITE;
+        }
+
+        g2d.setColor(textColor);
+        g2d.setFont(FONT_GAMEOVER);
+        FontMetrics fm = g2d.getFontMetrics();
+        Rectangle2D r2d = fm.getStringBounds(message, g2d);
+        int x = (Board.CANVAS_WIDTH - (int) r2d.getWidth()) / 2;
+        int y = (Board.CANVAS_HEIGHT - (int) r2d.getHeight()) / 2 + fm.getAscent();
+        g2d.drawString(message, x, y);
+    }
+}
