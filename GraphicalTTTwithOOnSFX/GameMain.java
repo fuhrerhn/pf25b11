@@ -9,7 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Random; // Import Random untuk game ID
+import java.util.Random;
 
 public class GameMain extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -31,22 +31,19 @@ public class GameMain extends JFrame {
     private static AIDifficulty aiDifficulty = AIDifficulty.EASY;
     private static GameMode gameMode = GameMode.PLAYER_VS_AI;
 
-    // GUI components for login
     private JPanel loginPanel;
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private JLabel statusLabel;
 
-    // GUI components for game mode selection
     private JPanel modeSelectionPanel;
 
     private String onlineGameId;
-    private Seed myOnlineSeed; // Seed (X/O) untuk user yang sedang online
-    private Timer gameFetchTimer; // Timer untuk polling status game online
-    private String currentOnlineUser; // Username user yang sedang login
+    private Seed myOnlineSeed;
+    private Timer gameFetchTimer;
+    private String currentOnlineUser;
 
-    // Database credentials, extracted from MySqlExample for use here
     private static final String DB_HOST = "mysql-tictactoe-pf2511b.c.aivencloud.com";
     private static final String DB_PORT = "23308";
     private static final String DB_NAME = "tictactoedb";
@@ -54,24 +51,22 @@ public class GameMain extends JFrame {
     private static final String DB_PASS = "AVNS_yJalhq5JBAgd9LeEGxU";
     private static final String DB_URL = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?sslmode=require";
 
-    private JLabel statusBar; // Status bar untuk menampilkan pesan di game UI
+    private JLabel statusBar;
 
     public GameMain() {
-        // Initialize Sound Effects once at the beginning
         SoundEffect.initGame();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(TITLE);
-        setResizable(false); // Make frame non-resizable
+        setResizable(false);
 
-        // Show login screen initially
         showLoginScreen();
     }
 
     private void showLoginScreen() {
         loginPanel = new JPanel();
         loginPanel.setLayout(new GridBagLayout());
-        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); // Ukuran yang konsisten
+        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
         loginPanel.setBackground(GameUI.COLOR_BG);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -160,7 +155,6 @@ public class GameMain extends JFrame {
                 });
                 timer.setRepeats(false);
                 timer.start();
-                // Hapus baris ini: showGameModeSelectionScreen();
             } else {
                 statusLabel.setForeground(Color.RED);
                 statusLabel.setText("Username atau password salah!");
@@ -173,12 +167,11 @@ public class GameMain extends JFrame {
     }
 
     private void showGameModeSelectionScreen() {
-        // Stop any running game fetch timer from previous online game
         if (gameFetchTimer != null && gameFetchTimer.isRunning()) {
             gameFetchTimer.stop();
         }
 
-        getContentPane().removeAll(); // Clear current content
+        getContentPane().removeAll();
 
         modeSelectionPanel = new JPanel();
         modeSelectionPanel.setLayout(new GridBagLayout());
@@ -255,7 +248,7 @@ public class GameMain extends JFrame {
             }
             startNewGame();
         } else {
-            showGameModeSelectionScreen(); // Kembali ke pemilihan mode jika dibatalkan
+            showGameModeSelectionScreen();
         }
     }
 
@@ -272,30 +265,39 @@ public class GameMain extends JFrame {
                 options[0]
         );
 
-        if (choice == JOptionPane.YES_OPTION) { // Buat Game Baru
+        if (choice == JOptionPane.YES_OPTION) {
             createOnlineGame();
-        } else if (choice == JOptionPane.NO_OPTION) { // Bergabung Game
+        } else if (choice == JOptionPane.NO_OPTION) {
             joinOnlineGame();
         } else {
-            showGameModeSelectionScreen(); // Kembali ke pemilihan mode jika dibatalkan
+            showGameModeSelectionScreen();
         }
     }
 
     private void createOnlineGame() {
         try {
-            // Generate a random 6-digit game ID
             Random random = new Random();
             int min = 100000;
             int max = 999999;
             onlineGameId = String.valueOf(random.nextInt(max - min + 1) + min);
-            myOnlineSeed = Seed.CROSS; // Creator is always X
+            myOnlineSeed = Seed.CROSS;
+
+            // Inisialisasi gameLogic di sini sebelum digunakan oleh OnlineGameManager
+            gameLogic = new GameLogic();
+            gameLogic.setGameMainInstance(this);
+            gameLogic.setGameMode(gameMode); // Sudah diatur ke PLAYER_VS_PLAYER_ONLINE
+            gameLogic.setOnlineGameId(onlineGameId);
+            gameLogic.setMyOnlineSeed(myOnlineSeed);
+            gameLogic.setCurrentOnlineUser(currentOnlineUser);
+            gameLogic.newGame(); // Inisialisasi papan dan status game
 
             onlineGameManager = new OnlineGameManager(this, gameLogic, onlineGameId, myOnlineSeed, currentOnlineUser);
-            onlineGameManager.createNewGame(); // Create game in DB
+            onlineGameManager.createNewGame();
 
             JOptionPane.showMessageDialog(this, "Game ID Anda: " + onlineGameId + "\nAnda adalah Player X. Menunggu pemain lain...", "Buat Game Online", JOptionPane.INFORMATION_MESSAGE);
 
-            // Start polling for opponent and game state
+            setupGameUI(); // Panggil setupGameUI setelah gameLogic siap
+
             gameFetchTimer = new Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -305,13 +307,12 @@ public class GameMain extends JFrame {
                     } else if (gameLogic.getCurrentState() != State.WAITING) {
                         gameFetchTimer.stop();
                         showGameOverDisplay();
-                    } else { // Still WAITING
+                    } else {
                         updateStatusBar("Menunggu pemain lain bergabung...");
                     }
                 }
             });
             gameFetchTimer.start();
-            startNewGame(); // Display empty board while waiting
             updateStatusBar("Menunggu pemain lain bergabung...");
 
         } catch (Exception ex) {
@@ -325,15 +326,24 @@ public class GameMain extends JFrame {
         String idInput = JOptionPane.showInputDialog(this, "Masukkan Game ID:");
         if (idInput != null && !idInput.trim().isEmpty()) {
             onlineGameId = idInput.trim();
-            myOnlineSeed = Seed.NOUGHT; // Joiner is always O
+            myOnlineSeed = Seed.NOUGHT;
+
+            // Inisialisasi gameLogic di sini sebelum digunakan oleh OnlineGameManager
+            gameLogic = new GameLogic();
+            gameLogic.setGameMainInstance(this);
+            gameLogic.setGameMode(gameMode); // Sudah diatur ke PLAYER_VS_PLAYER_ONLINE
+            gameLogic.setOnlineGameId(onlineGameId);
+            gameLogic.setMyOnlineSeed(myOnlineSeed);
+            gameLogic.setCurrentOnlineUser(currentOnlineUser);
+            gameLogic.newGame(); // Inisialisasi papan dan status game
 
             onlineGameManager = new OnlineGameManager(this, gameLogic, onlineGameId, myOnlineSeed, currentOnlineUser);
 
             if (onlineGameManager.joinExistingGame()) {
                 JOptionPane.showMessageDialog(this, "Berhasil bergabung dengan game " + onlineGameId + "!\nAnda adalah Player O.", "Bergabung Game Online", JOptionPane.INFORMATION_MESSAGE);
-                startNewGame();
 
-                // Start polling for game state
+                setupGameUI(); // Panggil setupGameUI setelah gameLogic siap
+
                 gameFetchTimer = new Timer(1000, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -347,45 +357,43 @@ public class GameMain extends JFrame {
                     }
                 });
                 gameFetchTimer.start();
+                updateStatusBar(gameLogic.getStatusMessage()); // Perbarui status awal untuk pemain O
 
             } else {
                 JOptionPane.showMessageDialog(this, "Gagal bergabung. Game ID tidak valid atau sudah penuh.", "Error", JOptionPane.ERROR_MESSAGE);
                 showOnlineGameOptions();
             }
         } else {
-            showOnlineGameOptions(); // Kembali ke opsi online jika dibatalkan
+            showOnlineGameOptions();
         }
     }
 
     public void startNewGame() {
-        // Stop any existing game fetch timer
         if (gameFetchTimer != null && gameFetchTimer.isRunning()) {
             gameFetchTimer.stop();
         }
 
-        gameLogic = new GameLogic();
-        gameLogic.setGameMainInstance(this); // Pass GameMain instance to GameLogic
-        gameLogic.setGameMode(gameMode);
+        // Hanya inisialisasi gameLogic untuk mode AI atau lokal
+        // Untuk mode online, gameLogic sudah diinisialisasi di createOnlineGame/joinOnlineGame
+        if (gameMode == GameMode.PLAYER_VS_AI || gameMode == GameMode.PLAYER_VS_PLAYER_LOCAL) {
+            gameLogic = new GameLogic();
+            gameLogic.setGameMainInstance(this);
+            gameLogic.setGameMode(gameMode);
 
-        if (gameMode == GameMode.PLAYER_VS_AI) {
-            gameLogic.setAIDifficulty(aiDifficulty);
-        } else if (gameMode == GameMode.PLAYER_VS_PLAYER_ONLINE) {
-            gameLogic.setOnlineGameId(onlineGameId);
-            gameLogic.setMyOnlineSeed(myOnlineSeed);
-            gameLogic.setCurrentOnlineUser(currentOnlineUser); // Set current user for online game
+            if (gameMode == GameMode.PLAYER_VS_AI) {
+                gameLogic.setAIDifficulty(aiDifficulty);
+            }
         }
-        gameLogic.newGame(); // Reset game state
 
-        setupGameUI(); // Set up the game board UI
+        // Panggil newGame() untuk mereset papan dan status
+        gameLogic.newGame();
+        setupGameUI();
     }
 
     private void setupGameUI() {
-        getContentPane().removeAll(); // Clear previous content
+        getContentPane().removeAll();
 
-        // Create GameUI panel
         gameUI = new GameUI(gameLogic);
-
-        // Create status bar
         statusBar = new JLabel(gameLogic.getStatusMessage(), SwingConstants.CENTER);
         statusBar.setFont(GameUI.FONT_STATUS);
         statusBar.setBackground(GameUI.COLOR_BG_STATUS);
@@ -402,16 +410,14 @@ public class GameMain extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // For online game, if current player is NOUGHT (second player), start polling immediately
-        // X (creator) will wait for O to join, and O will immediately fetch
-        // After O joins, the creator (X) also starts fetching
+        // Hanya untuk pemain O yang bergabung, timer polling dimulai di sini
+        // Pembuat game (X) sudah memulai timer di createOnlineGame
         if (gameMode == GameMode.PLAYER_VS_PLAYER_ONLINE) {
-            if (myOnlineSeed == Seed.NOUGHT) { // If I am player O, I joined, so start polling
-                gameFetchTimer.start();
-            } else { // If I am player X, I created, and I'm waiting for O to join (polling already started in createOnlineGame)
-                // Do nothing here, timer is already running.
+            if (myOnlineSeed == Seed.NOUGHT) {
+                // Timer sudah dimulai di joinOnlineGame, jadi tidak perlu di sini lagi
+            } else {
+                // Untuk X, timer sudah dimulai di createOnlineGame
             }
-            // Initial update of status bar for online game
             updateStatusBar(gameLogic.getStatusMessage());
         }
     }
@@ -429,7 +435,6 @@ public class GameMain extends JFrame {
     }
 
     public void showGameOverDisplay() {
-        // Stop the polling timer if it's an online game
         if (gameFetchTimer != null && gameFetchTimer.isRunning()) {
             gameFetchTimer.stop();
         }
@@ -439,14 +444,13 @@ public class GameMain extends JFrame {
     }
 
     public void returnToGameModeSelection() {
-        // Ensure any online game resources are cleaned up or flags reset
         this.onlineGameId = null;
         this.myOnlineSeed = null;
         this.onlineGameManager = null;
-        this.gameLogic = null; // Clear game logic instance
+        this.gameLogic = null; // Reset gameLogic instance
 
-        getContentPane().removeAll(); // Clear game UI
-        showGameModeSelectionScreen(); // Go back to mode selection
+        getContentPane().removeAll();
+        showGameModeSelectionScreen();
         revalidate();
         repaint();
     }
