@@ -127,6 +127,8 @@ public class GameLogic {
     }
 
     // Metode untuk menerima dan menerapkan gerakan online dari database
+    // Note: This method seems redundant with the updated stepGame.
+    // Consider unifying logic into stepGame if possible, or ensuring distinct uses.
     public void applyOnlineMove(int row, int col, Seed playerSeed, State newGameState, Seed newCurrentPlayer) {
         // Hanya terapkan jika ada perubahan atau jika ini giliran lawan dan kita menerima gerakannya
         if (board.cells[row][col].content == Seed.NO_SEED) {
@@ -244,12 +246,33 @@ public class GameLogic {
         }
     }
 
-    // Metode ini akan dipanggil oleh OnlineGameManager untuk memperbarui state lokal
+    /**
+     * Updates the game state (current player, game status) and repaints the UI.
+     * Optionally applies a move to the board if valid row/column indices are provided.
+     * This method is designed to be called by OnlineGameManager for both move execution
+     * and state synchronization.
+     *
+     * @param player The Seed of the player making the move (if applicable).
+     * @param row The row of the move. Pass -1 if no specific cell update is needed (e.g., during state fetch).
+     * @param col The column of the move. Pass -1 if no specific cell update is needed.
+     * @param newGameState The new State of the game.
+     * @param newCurrentPlayer The Seed of the player whose turn it is next.
+     * @return The updated current State of the game.
+     */
     public State stepGame(Seed player, int row, int col, State newGameState, Seed newCurrentPlayer) {
-        if (board.cells[row][col].content == Seed.NO_SEED) { // Hanya jika sel kosong
-            board.cells[row][col].content = player;
-            SoundEffect.EAT_FOOD.play();
+        // Only attempt to place a seed if valid row/col are provided (i.e., it's an actual move)
+        // This prevents ArrayIndexOutOfBoundsException when -1 is passed for row/col.
+        if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS) {
+            // Check if the cell is empty before placing a seed, similar to local game logic
+            // (This check should ideally be done before calling stepGame with an actual move,
+            // or handled differently if the cell is already occupied, e.g., by logging an error)
+            if (board.cells[row][col].content == Seed.NO_SEED) {
+                board.cells[row][col].content = player;
+                SoundEffect.EAT_FOOD.play();
+            }
         }
+
+        // Always update the overall game state and current player
         this.currentState = newGameState;
         this.currentPlayer = newCurrentPlayer;
 
