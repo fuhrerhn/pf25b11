@@ -2,14 +2,14 @@ package GraphicalTTTwithOOnSFX;
 
 import java.sql.*;
 
-public class MySqlExample {
+public class MySqlExample{
     public static void main(String[] args) throws ClassNotFoundException {
         String host, port, databaseName, userName, password;
         host = "mysql-tictactoe-pf2511b.c.aivencloud.com";
-                port = "23308";
-                databaseName = "tictactoedb";
-                userName = "avnadmin";
-                password = "AVNS_yJalhq5JBAgd9LeEGxU";
+        port = "23308";
+        databaseName = "tictactoedb";
+        userName = "avnadmin";
+        password = "AVNS_yJalhq5JBAgd9LeEGxU";
         /*for (int i = 0; i < args.length - 1; i++) {
             switch (args[i].toLowerCase(Locale.ROOT)) {
                 case "-host": host = args[++i]; break;
@@ -19,7 +19,8 @@ public class MySqlExample {
                 case "-port": port = args[++i]; break;
             }
         }*/
-         //JDBC allows to have nullable username and password
+
+        //JDBC allows to have nullable username and password
         if (host == null || port == null || databaseName == null) {
             System.out.println("Host, port, database information is required");
             return;

@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D;
 public class GameUI extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    public static final Color COLOR_BG = new Color(0, 0, 0);
+    // public static final Color COLOR_BG = new Color(0, 0, 0); // Remove or make non-final
     public static final Color COLOR_BG_STATUS = new Color(202, 202, 202);
     public static final Color COLOR_CROSS = new Color(239, 105, 80);
     public static final Color COLOR_NOUGHT = new Color(64, 154, 225);
@@ -20,16 +20,14 @@ public class GameUI extends JPanel {
 
     public GameUI(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
-        // Hapus penambahan statusBar di sini, karena akan ditambahkan di GameMain
-        setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); // Hanya ukuran papan
-        setBackground(COLOR_BG);
+        setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
+        setBackground(GameMain.currentBackgroundColor); // Use global theme color
         setFocusable(true);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Delegasikan penanganan klik ke GameLogic
                 gameLogic.handleMouseClick(e);
-                repaint(); // Minta UI untuk menggambar ulang setelah setiap klik
+                repaint();
             }
         });
     }
@@ -43,27 +41,28 @@ public class GameUI extends JPanel {
         gameLogic.getBoard().paint(g2d);
 
         // Draw game over screen if game has ended
-        if (gameLogic.getCurrentState() != State.PLAYING && gameLogic.getCurrentState() != State.WAITING) { // Jangan tampilkan saat WAITING
+        if (gameLogic.getCurrentState() != State.PLAYING && gameLogic.getCurrentState() != State.WAITING) {
             drawGameOverScreen(g2d);
         }
     }
 
     private void drawGameOverScreen(Graphics2D g2d) {
-        g2d.setColor(new Color(0, 0, 0, 150));
+        // Overlay with semi-transparent background, color remains constant or adapts to theme
+        g2d.setColor(new Color(0, 0, 0, 150)); // This can be adapted to theme if needed
         g2d.fillRect(0, 0, Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT);
 
         String message = "";
-        Color textColor = Color.WHITE;
+        Color textColor = GameMain.currentForegroundColor; // Use current theme text color
 
         if (gameLogic.getCurrentState() == State.CROSS_WON) {
             message = "X Menang!";
-            textColor = COLOR_CROSS;
+            textColor = COLOR_CROSS; // Keep player specific colors
         } else if (gameLogic.getCurrentState() == State.NOUGHT_WON) {
             message = "O Menang!";
-            textColor = COLOR_NOUGHT;
+            textColor = COLOR_NOUGHT; // Keep player specific colors
         } else if (gameLogic.getCurrentState() == State.DRAW) {
             message = "Seri!";
-            textColor = Color.WHITE;
+            textColor = GameMain.currentForegroundColor; // Use current theme text color for draw
         }
 
         g2d.setColor(textColor);

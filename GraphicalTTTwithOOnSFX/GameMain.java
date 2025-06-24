@@ -4,6 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import javax.imageio.ImageIO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,7 +42,9 @@ public class GameMain extends JFrame {
     private JButton loginButton;
     private JLabel statusLabel;
 
-    private JPanel modeSelectionPanel;
+    private JPanel homePanel;
+    private JPanel multiplayerOptionPanel;
+    private JPanel settingsPanel;
 
     private String onlineGameId;
     private Seed myOnlineSeed;
@@ -53,8 +60,41 @@ public class GameMain extends JFrame {
 
     private JLabel statusBar;
 
+    // Theme colors
+    public static Color currentBackgroundColor = new Color(0, 0, 0); // Default dark
+    public static Color currentForegroundColor = Color.WHITE; // Default dark
+
+    // Minecraft Assets
+    private BufferedImage minecraftBackground;
+    private Font minecraftFont;
+    private URL btnTextureURL;
+    private URL btnHoverTextureURL;
+    private URL btnPressedTextureURL;
+
     public GameMain() {
         SoundEffect.initGame();
+
+        // Load Minecraft assets
+        try {
+            // Adjust paths to your actual asset locations,
+            // relative to the GraphicalTTTwithOOnSFX package or directly under resources
+            minecraftBackground = ImageIO.read(getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_background.png")); //
+            minecraftFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("GraphicalTTTwithOOnSFX/assets/fonts/minecrafter.ttf")).deriveFont(24f); //
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(minecraftFont);
+
+            btnTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_button.png"); //
+            btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_button_hover.png"); //
+            btnPressedTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_button_pressed.png"); //
+
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load Minecraft assets! Please check file paths.", "Error", JOptionPane.ERROR_MESSAGE); //
+            // Fallback to default fonts/colors if assets fail to load
+            minecraftFont = new Font("Monospaced", Font.BOLD, 24);
+            currentBackgroundColor = new Color(64, 64, 64);
+            currentForegroundColor = Color.WHITE;
+        }
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(TITLE);
@@ -64,24 +104,42 @@ public class GameMain extends JFrame {
     }
 
     private void showLoginScreen() {
-        loginPanel = new JPanel();
-        loginPanel.setLayout(new GridBagLayout());
-        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
-        loginPanel.setBackground(GameUI.COLOR_BG);
+        loginPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (minecraftBackground != null) {
+                    // Tile the background if it's smaller than the panel
+                    int tileWidth = minecraftBackground.getWidth();
+                    int tileHeight = minecraftBackground.getHeight();
+                    for (int x = 0; x < getWidth(); x += tileWidth) {
+                        for (int y = 0; y < getHeight(); y += tileHeight) {
+                            g.drawImage(minecraftBackground, x, y, this);
+                        }
+                    }
+                } else {
+                    g.setColor(new Color(64, 64, 64)); // Fallback color
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel titleLabel = new JLabel("Login", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
+        JLabel titleLabel = new JLabel("Tic Tac Toe");
+        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 48f)); // Use Minecraft font
+        titleLabel.setForeground(Color.YELLOW); // Minecraft gold color
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         loginPanel.add(titleLabel, gbc);
 
         JLabel userLabel = new JLabel("Username:");
+        userLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
         userLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -89,40 +147,46 @@ public class GameMain extends JFrame {
         loginPanel.add(userLabel, gbc);
 
         usernameField = new JTextField(15);
+        usernameField.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
+        usernameField.setBackground(new Color(90, 90, 90)); // Darker background for text fields
+        usernameField.setForeground(Color.WHITE);
+        usernameField.setCaretColor(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 1;
         loginPanel.add(usernameField, gbc);
 
         JLabel passLabel = new JLabel("Password:");
+        passLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
         passLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.gridwidth = 1;
         loginPanel.add(passLabel, gbc);
 
         passwordField = new JPasswordField(15);
+        passwordField.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
+        passwordField.setBackground(new Color(90, 90, 90)); // Darker background for text fields
+        passwordField.setForeground(Color.WHITE);
+        passwordField.setCaretColor(Color.WHITE);
         gbc.gridx = 1;
         gbc.gridy = 2;
         loginPanel.add(passwordField, gbc);
 
-        loginButton = new JButton("Login");
+        MinecraftButton loginButton = new MinecraftButton("Login", btnTextureURL, btnHoverTextureURL, btnPressedTextureURL); //
+        loginButton.setFont(minecraftFont.deriveFont(Font.BOLD, 24f)); // Use Minecraft font
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
+        loginButton.addActionListener(e -> authenticateUser());
         loginPanel.add(loginButton, gbc);
 
         statusLabel = new JLabel("", SwingConstants.CENTER);
+        statusLabel.setFont(minecraftFont.deriveFont(16f)); // Use Minecraft font
         statusLabel.setForeground(Color.RED);
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         loginPanel.add(statusLabel, gbc);
-
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                authenticateUser();
-            }
-        });
 
         setContentPane(loginPanel);
         pack();
@@ -149,7 +213,7 @@ public class GameMain extends JFrame {
                 Timer timer = new Timer(delay, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        showGameModeSelectionScreen();
+                        showHomeScreen();
                         ((Timer)e.getSource()).stop();
                     }
                 });
@@ -166,58 +230,106 @@ public class GameMain extends JFrame {
         }
     }
 
-    private void showGameModeSelectionScreen() {
+    private void showHomeScreen() {
         if (gameFetchTimer != null && gameFetchTimer.isRunning()) {
             gameFetchTimer.stop();
         }
 
         getContentPane().removeAll();
 
-        modeSelectionPanel = new JPanel();
-        modeSelectionPanel.setLayout(new GridBagLayout());
-        modeSelectionPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
-        modeSelectionPanel.setBackground(GameUI.COLOR_BG);
+        homePanel = new JPanel();
+        homePanel.setLayout(new GridBagLayout());
+        homePanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
+        homePanel.setBackground(currentBackgroundColor); //
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 10, 15, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel titleLabel = new JLabel("Tic Tac Toe", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 48)); //
+        titleLabel.setForeground(currentForegroundColor); //
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        homePanel.add(titleLabel, gbc);
+
+        JButton singlePlayerButton = createStyledButton("Single Player"); // Changed from "Vs. Bot"
+        gbc.gridy = 1;
+        homePanel.add(singlePlayerButton, gbc);
+
+        JButton multiplayerButton = createStyledButton("Multiplayer");
+        gbc.gridy = 2;
+        homePanel.add(multiplayerButton, gbc);
+
+        JButton settingsButton = createStyledButton("Settings");
+        gbc.gridy = 3;
+        homePanel.add(settingsButton, gbc);
+
+        singlePlayerButton.addActionListener(e -> {
+            gameMode = GameMode.PLAYER_VS_AI;
+            showAIDifficultySelection();
+        });
+
+        multiplayerButton.addActionListener(e -> {
+            showMultiplayerOptions();
+        });
+
+        settingsButton.addActionListener(e -> {
+            showSettingsScreen();
+        });
+
+        setContentPane(homePanel);
+        revalidate();
+        repaint();
+    }
+
+    private void showMultiplayerOptions() {
+        getContentPane().removeAll();
+
+        multiplayerOptionPanel = new JPanel();
+        multiplayerOptionPanel.setLayout(new GridBagLayout());
+        multiplayerOptionPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
+        multiplayerOptionPanel.setBackground(currentBackgroundColor); //
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel titleLabel = new JLabel("Pilih Mode Permainan", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
+        JLabel titleLabel = new JLabel("Pilih Mode Multiplayer", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28)); //
+        titleLabel.setForeground(currentForegroundColor); //
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        modeSelectionPanel.add(titleLabel, gbc);
+        gbc.gridwidth = 1;
+        multiplayerOptionPanel.add(titleLabel, gbc);
 
-        JButton pvaiButton = new JButton("Player vs AI");
+        JButton offlineMultiplayerButton = createStyledButton("Multiplayer Offline");
         gbc.gridy = 1;
-        modeSelectionPanel.add(pvaiButton, gbc);
+        multiplayerOptionPanel.add(offlineMultiplayerButton, gbc);
 
-        JButton pvpLocalButton = new JButton("Player vs Player (Lokal)");
+        JButton onlineMultiplayerButton = createStyledButton("Multiplayer Online");
         gbc.gridy = 2;
-        modeSelectionPanel.add(pvpLocalButton, gbc);
+        multiplayerOptionPanel.add(onlineMultiplayerButton, gbc);
 
-        JButton pvpOnlineButton = new JButton("Player vs Player (Online)");
+        JButton backButton = createStyledButton("Kembali");
         gbc.gridy = 3;
-        modeSelectionPanel.add(pvpOnlineButton, gbc);
+        multiplayerOptionPanel.add(backButton, gbc);
 
-        pvaiButton.addActionListener(e -> {
-            gameMode = GameMode.PLAYER_VS_AI;
-            showAIDifficultySelection();
-        });
-
-        pvpLocalButton.addActionListener(e -> {
+        offlineMultiplayerButton.addActionListener(e -> {
             gameMode = GameMode.PLAYER_VS_PLAYER_LOCAL;
             startNewGame();
         });
 
-        pvpOnlineButton.addActionListener(e -> {
-            gameMode = GameMode.PLAYER_VS_PLAYER_ONLINE;
+        onlineMultiplayerButton.addActionListener(e -> {
             showOnlineGameOptions();
         });
 
-        setContentPane(modeSelectionPanel);
+        backButton.addActionListener(e -> {
+            showHomeScreen();
+        });
+
+        setContentPane(multiplayerOptionPanel);
         revalidate();
         repaint();
     }
@@ -243,12 +355,12 @@ public class GameMain extends JFrame {
                     aiDifficulty = AIDifficulty.MEDIUM;
                     break;
                 case "Hard":
-                    aiDifficulty = AIDifficulty.HARD;
+                    aiDifficulty = AIDAIDifficulty.HARD; // Fixed typo
                     break;
             }
             startNewGame();
         } else {
-            showGameModeSelectionScreen();
+            showHomeScreen();
         }
     }
 
@@ -270,7 +382,7 @@ public class GameMain extends JFrame {
         } else if (choice == JOptionPane.NO_OPTION) {
             joinOnlineGame();
         } else {
-            showGameModeSelectionScreen();
+            showMultiplayerOptions();
         }
     }
 
@@ -282,21 +394,20 @@ public class GameMain extends JFrame {
             onlineGameId = String.valueOf(random.nextInt(max - min + 1) + min);
             myOnlineSeed = Seed.CROSS;
 
-            // Inisialisasi gameLogic di sini sebelum digunakan oleh OnlineGameManager
             gameLogic = new GameLogic();
             gameLogic.setGameMainInstance(this);
-            gameLogic.setGameMode(gameMode); // Sudah diatur ke PLAYER_VS_PLAYER_ONLINE
+            gameLogic.setGameMode(gameMode);
             gameLogic.setOnlineGameId(onlineGameId);
             gameLogic.setMyOnlineSeed(myOnlineSeed);
             gameLogic.setCurrentOnlineUser(currentOnlineUser);
-            gameLogic.newGame(); // Inisialisasi papan dan status game
+            gameLogic.newGame();
 
             onlineGameManager = new OnlineGameManager(this, gameLogic, onlineGameId, myOnlineSeed, currentOnlineUser);
             onlineGameManager.createNewGame();
 
             JOptionPane.showMessageDialog(this, "Game ID Anda: " + onlineGameId + "\nAnda adalah Player X. Menunggu pemain lain...", "Buat Game Online", JOptionPane.INFORMATION_MESSAGE);
 
-            setupGameUI(); // Panggil setupGameUI setelah gameLogic siap
+            setupGameUI();
 
             gameFetchTimer = new Timer(1000, new ActionListener() {
                 @Override
@@ -328,21 +439,20 @@ public class GameMain extends JFrame {
             onlineGameId = idInput.trim();
             myOnlineSeed = Seed.NOUGHT;
 
-            // Inisialisasi gameLogic di sini sebelum digunakan oleh OnlineGameManager
             gameLogic = new GameLogic();
             gameLogic.setGameMainInstance(this);
-            gameLogic.setGameMode(gameMode); // Sudah diatur ke PLAYER_VS_PLAYER_ONLINE
+            gameLogic.setGameMode(gameMode);
             gameLogic.setOnlineGameId(onlineGameId);
             gameLogic.setMyOnlineSeed(myOnlineSeed);
             gameLogic.setCurrentOnlineUser(currentOnlineUser);
-            gameLogic.newGame(); // Inisialisasi papan dan status game
+            gameLogic.newGame();
 
             onlineGameManager = new OnlineGameManager(this, gameLogic, onlineGameId, myOnlineSeed, currentOnlineUser);
 
             if (onlineGameManager.joinExistingGame()) {
                 JOptionPane.showMessageDialog(this, "Berhasil bergabung dengan game " + onlineGameId + "!\nAnda adalah Player O.", "Bergabung Game Online", JOptionPane.INFORMATION_MESSAGE);
 
-                setupGameUI(); // Panggil setupGameUI setelah gameLogic siap
+                setupGameUI();
 
                 gameFetchTimer = new Timer(1000, new ActionListener() {
                     @Override
@@ -357,7 +467,7 @@ public class GameMain extends JFrame {
                     }
                 });
                 gameFetchTimer.start();
-                updateStatusBar(gameLogic.getStatusMessage()); // Perbarui status awal untuk pemain O
+                updateStatusBar(gameLogic.getStatusMessage());
 
             } else {
                 JOptionPane.showMessageDialog(this, "Gagal bergabung. Game ID tidak valid atau sudah penuh.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -373,8 +483,6 @@ public class GameMain extends JFrame {
             gameFetchTimer.stop();
         }
 
-        // Hanya inisialisasi gameLogic untuk mode AI atau lokal
-        // Untuk mode online, gameLogic sudah diinisialisasi di createOnlineGame/joinOnlineGame
         if (gameMode == GameMode.PLAYER_VS_AI || gameMode == GameMode.PLAYER_VS_PLAYER_LOCAL) {
             gameLogic = new GameLogic();
             gameLogic.setGameMainInstance(this);
@@ -385,7 +493,6 @@ public class GameMain extends JFrame {
             }
         }
 
-        // Panggil newGame() untuk mereset papan dan status
         gameLogic.newGame();
         setupGameUI();
     }
@@ -410,13 +517,11 @@ public class GameMain extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Hanya untuk pemain O yang bergabung, timer polling dimulai di sini
-        // Pembuat game (X) sudah memulai timer di createOnlineGame
         if (gameMode == GameMode.PLAYER_VS_PLAYER_ONLINE) {
             if (myOnlineSeed == Seed.NOUGHT) {
-                // Timer sudah dimulai di joinOnlineGame, jadi tidak perlu di sini lagi
+                // Timer already started in joinOnlineGame
             } else {
-                // Untuk X, timer sudah dimulai di createOnlineGame
+                // For X, timer already started in createOnlineGame
             }
             updateStatusBar(gameLogic.getStatusMessage());
         }
@@ -450,9 +555,232 @@ public class GameMain extends JFrame {
         this.gameLogic = null; // Reset gameLogic instance
 
         getContentPane().removeAll();
-        showGameModeSelectionScreen();
+        showHomeScreen();
         revalidate();
         repaint();
+    }
+
+    private void showSettingsScreen() {
+        getContentPane().removeAll();
+
+        settingsPanel = new JPanel();
+        settingsPanel.setLayout(new GridBagLayout());
+        settingsPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
+        settingsPanel.setBackground(currentBackgroundColor); //
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 10, 15, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel titleLabel = new JLabel("Settings", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); //
+        titleLabel.setForeground(currentForegroundColor); //
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        settingsPanel.add(titleLabel, gbc);
+
+        // Theme Selection
+        JLabel themeLabel = new JLabel("Theme:");
+        themeLabel.setForeground(currentForegroundColor); //
+        themeLabel.setFont(new Font("Arial", Font.PLAIN, 18)); //
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        settingsPanel.add(themeLabel, gbc);
+
+        JRadioButton lightTheme = new JRadioButton("Light");
+        lightTheme.setForeground(currentForegroundColor); //
+        lightTheme.setBackground(currentBackgroundColor); //
+        lightTheme.setFont(new Font("Arial", Font.PLAIN, 16)); //
+        lightTheme.setSelected(currentBackgroundColor.equals(Color.WHITE));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        settingsPanel.add(lightTheme, gbc);
+
+        JRadioButton darkTheme = new JRadioButton("Dark");
+        darkTheme.setForeground(currentForegroundColor); //
+        darkTheme.setBackground(currentBackgroundColor); //
+        darkTheme.setFont(new Font("Arial", Font.PLAIN, 16)); //
+        darkTheme.setSelected(currentBackgroundColor.equals(new Color(0, 0, 0)));
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        settingsPanel.add(darkTheme, gbc);
+
+        ButtonGroup themeGroup = new ButtonGroup();
+        themeGroup.add(lightTheme);
+        themeGroup.add(darkTheme);
+
+        lightTheme.addActionListener(e -> applyTheme(true));
+        darkTheme.addActionListener(e -> applyTheme(false));
+
+        // Sound On/Off
+        JLabel soundLabel = new JLabel("Sound:");
+        soundLabel.setForeground(currentForegroundColor); //
+        soundLabel.setFont(new Font("Arial", Font.PLAIN, 18)); //
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        settingsPanel.add(soundLabel, gbc);
+
+        JRadioButton soundOn = new JRadioButton("On");
+        soundOn.setForeground(currentForegroundColor); //
+        soundOn.setBackground(currentBackgroundColor); //
+        soundOn.setFont(new Font("Arial", Font.PLAIN, 16)); //
+        soundOn.setSelected(SoundEffect.volume != SoundEffect.Volume.MUTE); //
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        settingsPanel.add(soundOn, gbc);
+
+        JRadioButton soundOff = new JRadioButton("Off");
+        soundOff.setForeground(currentForegroundColor); //
+        soundOff.setBackground(currentBackgroundColor); //
+        soundOff.setFont(new Font("Arial", Font.PLAIN, 16)); //
+        soundOff.setSelected(SoundEffect.volume == SoundEffect.Volume.MUTE); //
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        settingsPanel.add(soundOff, gbc);
+
+        ButtonGroup soundGroup = new ButtonGroup();
+        soundGroup.add(soundOn);
+        soundGroup.add(soundOff);
+
+        soundOn.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.LOW); // Or MEDIUM/HIGH
+        soundOff.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.MUTE); //
+
+        // Back Button
+        JButton backButton = createStyledButton("Kembali");
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        settingsPanel.add(backButton, gbc);
+
+        backButton.addActionListener(e -> showHomeScreen());
+
+        setContentPane(settingsPanel);
+        revalidate();
+        repaint();
+    }
+
+    private void applyTheme(boolean isLightTheme) {
+        if (isLightTheme) {
+            currentBackgroundColor = Color.WHITE;
+            currentForegroundColor = Color.BLACK;
+        } else {
+            currentBackgroundColor = new Color(0, 0, 0);
+            currentForegroundColor = Color.WHITE;
+        }
+        // Re-display the settings screen to apply changes immediately
+        showSettingsScreen(); // This re-renders the settings panel itself
+        // You might want to call repaint on other active panels too if they are part of a persistent layout
+        // For now, it will apply when you navigate to other screens because they use currentBackgroundColor/ForegroundColor
+    }
+
+    // Helper method to create styled buttons for interactive feel
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 22)); //
+        button.setBackground(new Color(64, 154, 225)); // A pleasant blue color
+        button.setForeground(Color.WHITE); // White text
+        button.setFocusPainted(false); // Remove focus border
+        button.setBorder(BorderFactory.createLineBorder(new Color(40, 100, 150), 3)); // Custom border
+        button.setRolloverEnabled(true); //
+        button.getModel().addChangeListener(e -> {
+            ButtonModel model = (ButtonModel) e.getSource();
+            if (model.isRollover()) {
+                button.setBackground(new Color(80, 170, 240)); // Lighter blue on hover
+            } else {
+                button.setBackground(new Color(64, 154, 225)); // Original blue
+            }
+        });
+        button.setPreferredSize(new Dimension(250, 60)); // Fixed size for consistency
+        return button;
+    }
+
+    // Inner class for Minecraft styled button
+    private class MinecraftButton extends JButton {
+        private BufferedImage buttonTexture;
+        private BufferedImage buttonHoverTexture;
+        private BufferedImage buttonPressedTexture; // Added pressed texture
+        private boolean isHovered = false;
+        private boolean isPressed = false;
+
+        public MinecraftButton(String text, URL normalTextureURL, URL hoverTextureURL, URL pressedTextureURL) { //
+            super(text);
+            try {
+                if (normalTextureURL != null) buttonTexture = ImageIO.read(normalTextureURL);
+                if (hoverTextureURL != null) buttonHoverTexture = ImageIO.read(hoverTextureURL);
+                if (pressedTextureURL != null) buttonPressedTexture = ImageIO.read(pressedTextureURL);
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Fallback to default AWT button appearance if textures fail
+                setBackground(new Color(160, 82, 45)); // Wood-like color
+                setForeground(Color.WHITE);
+                setOpaque(true); // Ensure background is painted
+            }
+            setFocusPainted(false);
+            setBorderPainted(false);
+            setContentAreaFilled(false); // Allows us to draw our own texture
+
+            addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    isHovered = true;
+                    repaint();
+                }
+
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    isHovered = false;
+                    isPressed = false; // Reset pressed state on exit
+                    repaint();
+                }
+
+                public void mousePressed(java.awt.event.MouseEvent evt) {
+                    isPressed = true;
+                    repaint();
+                }
+
+                public void mouseReleased(java.awt.event.MouseEvent evt) {
+                    isPressed = false;
+                    repaint();
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            BufferedImage textureToDraw = null;
+
+            if (isPressed && buttonPressedTexture != null) {
+                textureToDraw = buttonPressedTexture;
+            } else if (isHovered && buttonHoverTexture != null) {
+                textureToDraw = buttonHoverTexture;
+            } else if (buttonTexture != null) {
+                textureToDraw = buttonTexture;
+            }
+
+            if (textureToDraw != null) {
+                g2d.drawImage(textureToDraw, 0, 0, getWidth(), getHeight(), this);
+            } else {
+                // Fallback for when textures aren't loaded or configured
+                super.paintComponent(g); // Draw default button background
+            }
+
+            // Draw text over the texture
+            g2d.setFont(getFont());
+            FontMetrics fm = g2d.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(getText())) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            g2d.setColor(getForeground()); // Assuming foreground color is set for text
+            g2d.drawString(getText(), x, y);
+            g2d.dispose();
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            // Adjust preferred size to fit your textures well
+            return new Dimension(180, 50); // Example size
+        }
     }
 
     public static void main(String[] args) {
