@@ -145,7 +145,7 @@ public class GameMain extends JFrame {
                 currentOnlineUser = username;
                 statusLabel.setForeground(Color.GREEN);
                 statusLabel.setText("Login Berhasil! Selamat datang, " + username + "!");
-                int delay = 2000;
+                int delay = 1000;
                 Timer timer = new Timer(delay, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
