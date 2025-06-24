@@ -67,7 +67,7 @@ public class GameMain extends JFrame {
     // Minecraft Assets
     private BufferedImage minecraftBackground;
     private Font minecraftFont;
-    private URL btnTextureURL;
+    private URL btnNormalTextureURL; // Changed from btnTextureURL
     private URL btnHoverTextureURL;
     private URL btnPressedTextureURL;
 
@@ -78,20 +78,22 @@ public class GameMain extends JFrame {
         try {
             // Adjust paths to your actual asset locations,
             // relative to the GraphicalTTTwithOOnSFX package or directly under resources
-            minecraftBackground = ImageIO.read(getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_background.png")); //
-            minecraftFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("GraphicalTTTwithOOnSFX/assets/fonts/minecrafter.ttf")).deriveFont(24f); //
+            // Corrected path from GraphicalTTTwithOOnSFX/GraphicalTTTwithOOnSFX.assets/
+            minecraftBackground = ImageIO.read(getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_background.png"));
+            minecraftFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("GraphicalTTTwithOOnSFX/assets/minecraft.ttf")).deriveFont(24f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(minecraftFont);
 
-            btnTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_button.png"); //
-            btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_button_hover.png"); //
-            btnPressedTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/images/minecraft_button_pressed.png"); //
+            // Corrected paths for buttons
+            btnNormalTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_normal.png");
+            btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_hover.png");
+            btnPressedTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_pressed.png");
 
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to load Minecraft assets! Please check file paths.", "Error", JOptionPane.ERROR_MESSAGE); //
+            JOptionPane.showMessageDialog(this, "Failed to load Minecraft assets! Please check file paths and ensure assets are in 'src/main/resources/GraphicalTTTwithOOnSFX/assets/'.", "Error", JOptionPane.ERROR_MESSAGE);
             // Fallback to default fonts/colors if assets fail to load
-            minecraftFont = new Font("Monospaced", Font.BOLD, 24);
+            minecraftFont = new Font("Monospaced", Font.BOLD, 24); // Fallback font
             currentBackgroundColor = new Color(64, 64, 64);
             currentForegroundColor = Color.WHITE;
         }
@@ -123,7 +125,7 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
+        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -172,7 +174,7 @@ public class GameMain extends JFrame {
         gbc.gridy = 2;
         loginPanel.add(passwordField, gbc);
 
-        MinecraftButton loginButton = new MinecraftButton("Login", btnTextureURL, btnHoverTextureURL, btnPressedTextureURL); //
+        MinecraftButton loginButton = new MinecraftButton("Login", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL); // Using normal, hover, pressed URLs
         loginButton.setFont(minecraftFont.deriveFont(Font.BOLD, 24f)); // Use Minecraft font
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -239,16 +241,16 @@ public class GameMain extends JFrame {
 
         homePanel = new JPanel();
         homePanel.setLayout(new GridBagLayout());
-        homePanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
-        homePanel.setBackground(currentBackgroundColor); //
+        homePanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
+        homePanel.setBackground(currentBackgroundColor);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Tic Tac Toe", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 48)); //
-        titleLabel.setForeground(currentForegroundColor); //
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        titleLabel.setForeground(currentForegroundColor);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
@@ -289,16 +291,16 @@ public class GameMain extends JFrame {
 
         multiplayerOptionPanel = new JPanel();
         multiplayerOptionPanel.setLayout(new GridBagLayout());
-        multiplayerOptionPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
-        multiplayerOptionPanel.setBackground(currentBackgroundColor); //
+        multiplayerOptionPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
+        multiplayerOptionPanel.setBackground(currentBackgroundColor);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Pilih Mode Multiplayer", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28)); //
-        titleLabel.setForeground(currentForegroundColor); //
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel.setForeground(currentForegroundColor);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
@@ -355,7 +357,7 @@ public class GameMain extends JFrame {
                     aiDifficulty = AIDifficulty.MEDIUM;
                     break;
                 case "Hard":
-                    aiDifficulty = AIDAIDifficulty.HARD; // Fixed typo
+                    aiDifficulty = AIDifficulty.HARD; // Fixed typo here
                     break;
             }
             startNewGame();
@@ -503,7 +505,7 @@ public class GameMain extends JFrame {
         gameUI = new GameUI(gameLogic);
         statusBar = new JLabel(gameLogic.getStatusMessage(), SwingConstants.CENTER);
         statusBar.setFont(GameUI.FONT_STATUS);
-        statusBar.setBackground(GameUI.COLOR_BG_STATUS);
+        statusBar.setBackground(GameUI.COLOR_BG_STATUS); // This color is fixed
         statusBar.setForeground(Color.BLACK);
         statusBar.setOpaque(true);
 
@@ -565,16 +567,16 @@ public class GameMain extends JFrame {
 
         settingsPanel = new JPanel();
         settingsPanel.setLayout(new GridBagLayout());
-        settingsPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT)); //
-        settingsPanel.setBackground(currentBackgroundColor); //
+        settingsPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
+        settingsPanel.setBackground(currentBackgroundColor);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Settings", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); //
-        titleLabel.setForeground(currentForegroundColor); //
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setForeground(currentForegroundColor);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -582,26 +584,26 @@ public class GameMain extends JFrame {
 
         // Theme Selection
         JLabel themeLabel = new JLabel("Theme:");
-        themeLabel.setForeground(currentForegroundColor); //
-        themeLabel.setFont(new Font("Arial", Font.PLAIN, 18)); //
+        themeLabel.setForeground(currentForegroundColor);
+        themeLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         settingsPanel.add(themeLabel, gbc);
 
         JRadioButton lightTheme = new JRadioButton("Light");
-        lightTheme.setForeground(currentForegroundColor); //
-        lightTheme.setBackground(currentBackgroundColor); //
-        lightTheme.setFont(new Font("Arial", Font.PLAIN, 16)); //
+        lightTheme.setForeground(currentForegroundColor);
+        lightTheme.setBackground(currentBackgroundColor);
+        lightTheme.setFont(new Font("Arial", Font.PLAIN, 16));
         lightTheme.setSelected(currentBackgroundColor.equals(Color.WHITE));
         gbc.gridx = 1;
         gbc.gridy = 1;
         settingsPanel.add(lightTheme, gbc);
 
         JRadioButton darkTheme = new JRadioButton("Dark");
-        darkTheme.setForeground(currentForegroundColor); //
-        darkTheme.setBackground(currentBackgroundColor); //
-        darkTheme.setFont(new Font("Arial", Font.PLAIN, 16)); //
+        darkTheme.setForeground(currentForegroundColor);
+        darkTheme.setBackground(currentBackgroundColor);
+        darkTheme.setFont(new Font("Arial", Font.PLAIN, 16));
         darkTheme.setSelected(currentBackgroundColor.equals(new Color(0, 0, 0)));
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -616,27 +618,27 @@ public class GameMain extends JFrame {
 
         // Sound On/Off
         JLabel soundLabel = new JLabel("Sound:");
-        soundLabel.setForeground(currentForegroundColor); //
-        soundLabel.setFont(new Font("Arial", Font.PLAIN, 18)); //
+        soundLabel.setForeground(currentForegroundColor);
+        soundLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
         settingsPanel.add(soundLabel, gbc);
 
         JRadioButton soundOn = new JRadioButton("On");
-        soundOn.setForeground(currentForegroundColor); //
-        soundOn.setBackground(currentBackgroundColor); //
-        soundOn.setFont(new Font("Arial", Font.PLAIN, 16)); //
-        soundOn.setSelected(SoundEffect.volume != SoundEffect.Volume.MUTE); //
+        soundOn.setForeground(currentForegroundColor);
+        soundOn.setBackground(currentBackgroundColor);
+        soundOn.setFont(new Font("Arial", Font.PLAIN, 16));
+        soundOn.setSelected(SoundEffect.volume != SoundEffect.Volume.MUTE);
         gbc.gridx = 1;
         gbc.gridy = 3;
         settingsPanel.add(soundOn, gbc);
 
         JRadioButton soundOff = new JRadioButton("Off");
-        soundOff.setForeground(currentForegroundColor); //
-        soundOff.setBackground(currentBackgroundColor); //
-        soundOff.setFont(new Font("Arial", Font.PLAIN, 16)); //
-        soundOff.setSelected(SoundEffect.volume == SoundEffect.Volume.MUTE); //
+        soundOff.setForeground(currentForegroundColor);
+        soundOff.setBackground(currentBackgroundColor);
+        soundOff.setFont(new Font("Arial", Font.PLAIN, 16));
+        soundOff.setSelected(SoundEffect.volume == SoundEffect.Volume.MUTE);
         gbc.gridx = 1;
         gbc.gridy = 4;
         settingsPanel.add(soundOff, gbc);
@@ -646,7 +648,7 @@ public class GameMain extends JFrame {
         soundGroup.add(soundOff);
 
         soundOn.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.LOW); // Or MEDIUM/HIGH
-        soundOff.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.MUTE); //
+        soundOff.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.MUTE);
 
         // Back Button
         JButton backButton = createStyledButton("Kembali");
@@ -679,12 +681,12 @@ public class GameMain extends JFrame {
     // Helper method to create styled buttons for interactive feel
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 22)); //
+        button.setFont(new Font("Arial", Font.BOLD, 22));
         button.setBackground(new Color(64, 154, 225)); // A pleasant blue color
         button.setForeground(Color.WHITE); // White text
         button.setFocusPainted(false); // Remove focus border
         button.setBorder(BorderFactory.createLineBorder(new Color(40, 100, 150), 3)); // Custom border
-        button.setRolloverEnabled(true); //
+        button.setRolloverEnabled(true);
         button.getModel().addChangeListener(e -> {
             ButtonModel model = (ButtonModel) e.getSource();
             if (model.isRollover()) {
@@ -705,7 +707,7 @@ public class GameMain extends JFrame {
         private boolean isHovered = false;
         private boolean isPressed = false;
 
-        public MinecraftButton(String text, URL normalTextureURL, URL hoverTextureURL, URL pressedTextureURL) { //
+        public MinecraftButton(String text, URL normalTextureURL, URL hoverTextureURL, URL pressedTextureURL) {
             super(text);
             try {
                 if (normalTextureURL != null) buttonTexture = ImageIO.read(normalTextureURL);
@@ -779,7 +781,7 @@ public class GameMain extends JFrame {
         @Override
         public Dimension getPreferredSize() {
             // Adjust preferred size to fit your textures well
-            return new Dimension(180, 50); // Example size
+            return new Dimension(180, 50); // Example size, adjust as needed based on your texture
         }
     }
 
