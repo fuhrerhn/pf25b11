@@ -39,14 +39,6 @@ public class Board {
         }
     }
 
-    public void newGame() {
-        for (int row = 0; row < ROWS; ++row) {
-            for (int col = 0; col < COLS; ++col) {
-                cells[row][col].newGame();
-            }
-        }
-    }
-
     public boolean hasWon(Seed player, int selectedRow, int selectedCol) {
         return (cells[selectedRow][0].content == player
                 && cells[selectedRow][1].content == player

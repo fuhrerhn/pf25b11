@@ -35,10 +35,6 @@ public class GameLogic {
         return currentState;
     }
 
-    public Seed getCurrentPlayer() {
-        return currentPlayer;
-    }
-
     public Board getBoard() {
         return board;
     }
