@@ -1,4 +1,5 @@
 package GraphicalTTTwithOOnSFX;
+
 import java.io.IOException;
 import java.net.URL;
 import javax.sound.sampled.AudioInputStream;
@@ -16,7 +17,7 @@ public enum SoundEffect {
         MUTE, LOW, MEDIUM, HIGH
     }
 
-    public static Volume volume = Volume.LOW; // Default volume
+    public static Volume volume = Volume.LOW;
 
     private Clip clip;
 
@@ -36,7 +37,7 @@ public enum SoundEffect {
     }
 
     public void play() {
-        if (volume != Volume.MUTE) { // Only play if not muted
+        if (volume != Volume.MUTE) {
             if (clip.isRunning())
                 clip.stop();
             clip.setFramePosition(0);
@@ -46,5 +47,31 @@ public enum SoundEffect {
 
     static void initGame() {
         values();
+    }
+
+    private static Clip bgmClip;
+    private static final String BGM_FILE_PATH = "GraphicalTTTwithOOnSFX/audio/bgm.wav";
+
+    public static void loadAndPlayBGM() {
+        try {
+            URL url = SoundEffect.class.getClassLoader().getResource(BGM_FILE_PATH);
+            if (url == null) {
+                System.err.println("BGM file not found: " + BGM_FILE_PATH);
+                return;
+            }
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
+            bgmClip = AudioSystem.getClip();
+            bgmClip.open(audioInputStream);
+            bgmClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void stopBGM() {
+        if (bgmClip != null && bgmClip.isRunning()) {
+            bgmClip.stop();
+            bgmClip.close();
+        }
     }
 }
