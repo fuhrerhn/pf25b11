@@ -187,6 +187,7 @@ public class GameMain extends JFrame {
 
         MinecraftButton loginButton = new MinecraftButton("Login", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL); // Using normal, hover, pressed URLs
         loginButton.setFont(minecraftFont.deriveFont(Font.BOLD, 24f)); // Use Minecraft font
+        loginButton.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -284,16 +285,19 @@ public class GameMain extends JFrame {
 
         MinecraftButton singlePlayerButton = new MinecraftButton("Single Player", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         singlePlayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        singlePlayerButton.setForeground(Color.WHITE);
         gbc.gridy = 1;
         homePanel.add(singlePlayerButton, gbc);
 
         MinecraftButton multiplayerButton = new MinecraftButton("Multiplayer", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         multiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        multiplayerButton.setForeground(Color.WHITE);
         gbc.gridy = 2;
         homePanel.add(multiplayerButton, gbc);
 
         MinecraftButton settingsButton = new MinecraftButton("Settings", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         settingsButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        settingsButton.setForeground(Color.WHITE);
         gbc.gridy = 3;
         homePanel.add(settingsButton, gbc);
 
@@ -352,16 +356,19 @@ public class GameMain extends JFrame {
 
         MinecraftButton offlineMultiplayerButton = new MinecraftButton("Multiplayer Offline", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         offlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        offlineMultiplayerButton.setForeground(Color.WHITE);
         gbc.gridy = 1;
         multiplayerOptionPanel.add(offlineMultiplayerButton, gbc);
 
         MinecraftButton onlineMultiplayerButton = new MinecraftButton("Multiplayer Online", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         onlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        onlineMultiplayerButton.setForeground(Color.WHITE);
         gbc.gridy = 2;
         multiplayerOptionPanel.add(onlineMultiplayerButton, gbc);
 
         MinecraftButton backButton = new MinecraftButton("Kembali", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        backButton.setForeground(Color.WHITE);
         gbc.gridy = 3;
         multiplayerOptionPanel.add(backButton, gbc);
 
@@ -853,6 +860,7 @@ public class GameMain extends JFrame {
         // Back Button
         MinecraftButton backButton = new MinecraftButton("Kembali", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        backButton.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
