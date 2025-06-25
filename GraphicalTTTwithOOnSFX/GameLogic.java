@@ -175,7 +175,7 @@ public class GameLogic {
                     return "Waiting for opponent's turn (" + currentPlayer.getDisplayName() + ")";
                 }
             } else {
-                return (currentPlayer == Seed.CROSS) ? "Giliran X" : "Giliran O";
+                return (currentPlayer == Seed.CROSS) ? "X's turn" : "O's turn";
             }
         } else if (currentState == State.DRAW) {
             SoundEffect.DIE.play();
