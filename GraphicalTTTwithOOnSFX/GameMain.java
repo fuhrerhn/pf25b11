@@ -20,12 +20,9 @@ import java.awt.event.MouseListener;
 
 public class GameMain extends JFrame {
     private static final long serialVersionUID = 1L;
-
     public static final String TITLE = "Tic Tac Toe";
-
-    // Define new constants for the overall application window size
-    public static final int APP_WIDTH = 600; // Increased width
-    public static final int APP_HEIGHT = 600; // Increased height, could be 480 or similar if prefer wider than tall
+    public static final int APP_WIDTH = 600;
+    public static final int APP_HEIGHT = 600;
 
     private GameLogic gameLogic;
     private GameUI gameUI;
@@ -66,20 +63,15 @@ public class GameMain extends JFrame {
 
     private JLabel statusBar;
 
-    // Theme colors
-    public static Color currentBackgroundColor = new Color(0, 0, 0); // Default dark
-    public static Color currentForegroundColor = Color.WHITE; // Default dark
-
-    // Minecraft Assets - Changed to public static
+    public static Color currentBackgroundColor = new Color(0, 0, 0);
+    public static Color currentForegroundColor = Color.WHITE;
     public static BufferedImage minecraftBackground;
     public static Font minecraftFont;
 
-    // Button texture URLs - these can remain private as they are used only within GameMain
     private URL btnNormalTextureURL;
     private URL btnHoverTextureURL;
     private URL btnPressedTextureURL;
 
-    // Static block to initialize static assets when the class is loaded
     static {
         try {
             minecraftBackground = ImageIO.read(GameMain.class.getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_background.png"));
@@ -96,11 +88,9 @@ public class GameMain extends JFrame {
         }
     }
 
-
     public GameMain() {
         SoundEffect.initGame();
 
-        // Load button textures here, as they are not static and tied to instance
         try {
             btnNormalTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_normal.png");
             btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_hover.png");
@@ -110,7 +100,6 @@ public class GameMain extends JFrame {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to load Minecraft button assets! Please check file paths and ensure assets are in 'src/main/resources/GraphicalTTTwithOOnSFX/assets/'.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(TITLE);
@@ -139,15 +128,15 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        loginPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
+        loginPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Tic Tac Toe");
-        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 48f)); // Use Minecraft font
-        titleLabel.setForeground(Color.YELLOW); // Minecraft gold color
+        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 48f));
+        titleLabel.setForeground(Color.YELLOW);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -155,7 +144,7 @@ public class GameMain extends JFrame {
         loginPanel.add(titleLabel, gbc);
 
         JLabel userLabel = new JLabel("Username:");
-        userLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
+        userLabel.setFont(minecraftFont.deriveFont(20f));
         userLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -163,8 +152,8 @@ public class GameMain extends JFrame {
         loginPanel.add(userLabel, gbc);
 
         usernameField = new JTextField(15);
-        usernameField.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
-        usernameField.setBackground(new Color(90, 90, 90)); // Darker background for text fields
+        usernameField.setFont(minecraftFont.deriveFont(20f));
+        usernameField.setBackground(new Color(90, 90, 90));
         usernameField.setForeground(Color.WHITE);
         usernameField.setCaretColor(Color.WHITE);
         gbc.gridx = 1;
@@ -172,7 +161,7 @@ public class GameMain extends JFrame {
         loginPanel.add(usernameField, gbc);
 
         JLabel passLabel = new JLabel("Password:");
-        passLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
+        passLabel.setFont(minecraftFont.deriveFont(20f));
         passLabel.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -180,8 +169,8 @@ public class GameMain extends JFrame {
         loginPanel.add(passLabel, gbc);
 
         passwordField = new JPasswordField(15);
-        passwordField.setFont(new Font("Arial", Font.PLAIN, 20)); // Use Minecraft font
-        passwordField.setBackground(new Color(90, 90, 90)); // Darker background for text fields
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 20));
+        passwordField.setBackground(new Color(90, 90, 90));
         passwordField.setForeground(Color.WHITE);
         passwordField.setCaretColor(Color.WHITE);
         passwordField.setEchoChar('*');
@@ -189,8 +178,8 @@ public class GameMain extends JFrame {
         gbc.gridy = 2;
         loginPanel.add(passwordField, gbc);
 
-        MinecraftButton loginButton = new MinecraftButton("Login", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL); // Using normal, hover, pressed URLs
-        loginButton.setFont(minecraftFont.deriveFont(Font.BOLD, 24f)); // Use Minecraft font
+        MinecraftButton loginButton = new MinecraftButton("Login", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
+        loginButton.setFont(minecraftFont.deriveFont(Font.BOLD, 24f));
         loginButton.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -199,7 +188,7 @@ public class GameMain extends JFrame {
         loginPanel.add(loginButton, gbc);
 
         statusLabel = new JLabel("", SwingConstants.CENTER);
-        statusLabel.setFont(minecraftFont.deriveFont(16f)); // Use Minecraft font
+        statusLabel.setFont(minecraftFont.deriveFont(16f));
         statusLabel.setForeground(Color.RED);
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -273,34 +262,34 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        homePanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
+        homePanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Tic Tac Toe", SwingConstants.CENTER);
-        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 48f)); // Use Minecraft font
-        titleLabel.setForeground(Color.YELLOW); // Minecraft gold color
+        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 48f));
+        titleLabel.setForeground(Color.YELLOW);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         homePanel.add(titleLabel, gbc);
 
         MinecraftButton singlePlayerButton = new MinecraftButton("Single Player", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        singlePlayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        singlePlayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         singlePlayerButton.setForeground(Color.WHITE);
         gbc.gridy = 1;
         homePanel.add(singlePlayerButton, gbc);
 
         MinecraftButton multiplayerButton = new MinecraftButton("Multiplayer", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        multiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        multiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         multiplayerButton.setForeground(Color.WHITE);
         gbc.gridy = 2;
         homePanel.add(multiplayerButton, gbc);
 
         MinecraftButton settingsButton = new MinecraftButton("Settings", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        settingsButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        settingsButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         settingsButton.setForeground(Color.WHITE);
         gbc.gridy = 3;
         homePanel.add(settingsButton, gbc);
@@ -344,14 +333,14 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        multiplayerOptionPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
+        multiplayerOptionPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Pilih Mode Multiplayer", SwingConstants.CENTER);
-        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 28f)); // Use Minecraft font
+        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 28f));
         titleLabel.setForeground(Color.YELLOW);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -359,19 +348,19 @@ public class GameMain extends JFrame {
         multiplayerOptionPanel.add(titleLabel, gbc);
 
         MinecraftButton offlineMultiplayerButton = new MinecraftButton("Multiplayer Offline", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        offlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        offlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         offlineMultiplayerButton.setForeground(Color.WHITE);
         gbc.gridy = 1;
         multiplayerOptionPanel.add(offlineMultiplayerButton, gbc);
 
         MinecraftButton onlineMultiplayerButton = new MinecraftButton("Multiplayer Online", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        onlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        onlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         onlineMultiplayerButton.setForeground(Color.WHITE);
         gbc.gridy = 2;
         multiplayerOptionPanel.add(onlineMultiplayerButton, gbc);
 
-        MinecraftButton backButton = new MinecraftButton("Kembali", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        MinecraftButton backButton = new MinecraftButton("Back", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
+        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         backButton.setForeground(Color.WHITE);
         gbc.gridy = 3;
         multiplayerOptionPanel.add(backButton, gbc);
@@ -395,35 +384,30 @@ public class GameMain extends JFrame {
     }
 
     private void showAIDifficultySelection() {
-        // Customizing JOptionPane for Minecraft theme is tricky.
-        // For now, we'll keep it default or minimal customization.
-        // To truly match Minecraft style, you'd need a custom JDialog.
         UIManager.put("OptionPane.background", new Color(64, 64, 64));
         UIManager.put("Panel.background", new Color(64, 64, 64));
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
-        UIManager.put("Button.background", new Color(160, 82, 45)); // Minecraft wood color
+        UIManager.put("Button.background", new Color(160, 82, 45));
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
+        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
         String[] difficulties = {"Easy", "Medium", "Hard"};
         String selectedDifficulty = (String) JOptionPane.showInputDialog(
                 this,
-                "Pilih Tingkat Kesulitan AI:",
-                "Tingkat Kesulitan",
+                "Choose Difficulty:",
+                "Difficulty",
                 JOptionPane.QUESTION_MESSAGE,
                 null, // No icon
                 difficulties,
                 difficulties[0]
         );
 
-        // Reset UIManager defaults after use if you want them to not affect other UI elements
         UIManager.put("OptionPane.background", null);
         UIManager.put("Panel.background", null);
         UIManager.put("OptionPane.messageForeground", null);
         UIManager.put("Button.background", null);
         UIManager.put("Button.foreground", null);
         UIManager.put("Button.font", null);
-
 
         if (selectedDifficulty != null) {
             switch (selectedDifficulty) {
@@ -448,14 +432,14 @@ public class GameMain extends JFrame {
         UIManager.put("OptionPane.background", new Color(64, 64, 64));
         UIManager.put("Panel.background", new Color(64, 64, 64));
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
-        UIManager.put("Button.background", new Color(160, 82, 45)); // Minecraft wood color
+        UIManager.put("Button.background", new Color(160, 82, 45));
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
+        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
-        Object[] options = {"Buat Game Baru", "Bergabung Game"};
+        Object[] options = {"Create New Game", "Join Game"};
         int choice = JOptionPane.showOptionDialog(
                 this,
-                "Pilih opsi game online:",
+                "Choose option:",
                 "Game Online",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
@@ -472,14 +456,15 @@ public class GameMain extends JFrame {
         UIManager.put("Button.font", null);
 
         if (choice == JOptionPane.YES_OPTION) {
+            this.gameMode = GameMode.PLAYER_VS_PLAYER_ONLINE;
             createOnlineGame();
         } else if (choice == JOptionPane.NO_OPTION) {
+            this.gameMode = GameMode.PLAYER_VS_PLAYER_ONLINE;
             joinOnlineGame();
         } else {
             showMultiplayerOptions();
         }
     }
-
     private void createOnlineGame() {
         try {
             Random random = new Random();
@@ -504,16 +489,14 @@ public class GameMain extends JFrame {
             UIManager.put("OptionPane.messageForeground", Color.WHITE);
             UIManager.put("Button.background", new Color(160, 82, 45));
             UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
-
-
+            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
             UIManager.put("OptionPane.background", null);
             UIManager.put("Panel.background", null);
             UIManager.put("OptionPane.messageForeground", null);
             UIManager.put("Button.background", null);
             UIManager.put("Button.foreground", null);
             UIManager.put("Button.font", null);
-            JOptionPane.showMessageDialog(this, "Game ID Anda: " + onlineGameId + "\nAnda adalah Player X. Menunggu pemain lain...", "Buat Game Online", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Your Room ID: " + onlineGameId + "\nYou are X. Waiting other player...", "Create Room", JOptionPane.INFORMATION_MESSAGE);
 
             setupGameUI();
 
@@ -527,12 +510,12 @@ public class GameMain extends JFrame {
                         gameFetchTimer.stop();
                         showGameOverDisplay();
                     } else {
-                        updateStatusBar("Menunggu pemain lain bergabung...");
+                        updateStatusBar("Waiting Other Player...");
                     }
                 }
             });
             gameFetchTimer.start();
-            updateStatusBar("Menunggu pemain lain bergabung...");
+            updateStatusBar("Waiting Other Player...");
 
         } catch (Exception ex) {
             UIManager.put("OptionPane.background", new Color(64, 64, 64));
@@ -540,9 +523,9 @@ public class GameMain extends JFrame {
             UIManager.put("OptionPane.messageForeground", Color.RED);
             UIManager.put("Button.background", new Color(160, 82, 45));
             UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
+            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
-            JOptionPane.showMessageDialog(this, "Gagal membuat game online: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Failed to Create Room: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
             UIManager.put("OptionPane.background", null);
             UIManager.put("Panel.background", null);
@@ -562,14 +545,13 @@ public class GameMain extends JFrame {
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
         UIManager.put("Button.background", new Color(160, 82, 45));
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
+        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
         UIManager.put("TextField.background", new Color(90, 90, 90));
         UIManager.put("TextField.foreground", Color.WHITE);
         UIManager.put("TextField.caretForeground", Color.WHITE);
-        UIManager.put("TextField.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
+        UIManager.put("TextField.font", minecraftFont.deriveFont(18f));
 
-
-        String idInput = JOptionPane.showInputDialog(this, "Masukkan Game ID:");
+        String idInput = JOptionPane.showInputDialog(this, "Enter Room ID");
 
         UIManager.put("OptionPane.background", null);
         UIManager.put("Panel.background", null);
@@ -581,7 +563,6 @@ public class GameMain extends JFrame {
         UIManager.put("TextField.foreground", null);
         UIManager.put("TextField.caretForeground", null);
         UIManager.put("TextField.font", null);
-
 
         if (idInput != null && !idInput.trim().isEmpty()) {
             onlineGameId = idInput.trim();
@@ -605,7 +586,7 @@ public class GameMain extends JFrame {
                 UIManager.put("Button.foreground", Color.WHITE);
                 UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
-                JOptionPane.showMessageDialog(this, "Berhasil bergabung dengan game " + onlineGameId + "!\nAnda adalah Player O.", "Bergabung Game Online", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Successfully Joined the Room " + onlineGameId + "!\nYou Are O.", "Joining Online Room", JOptionPane.INFORMATION_MESSAGE);
 
                 UIManager.put("OptionPane.background", null);
                 UIManager.put("Panel.background", null);
@@ -639,7 +620,7 @@ public class GameMain extends JFrame {
                 UIManager.put("Button.foreground", Color.WHITE);
                 UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
-                JOptionPane.showMessageDialog(this, "Gagal bergabung. Game ID tidak valid atau sudah penuh.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to Join. Room ID may be Invalid or Full.", "Error", JOptionPane.ERROR_MESSAGE);
 
                 UIManager.put("OptionPane.background", null);
                 UIManager.put("Panel.background", null);
@@ -679,9 +660,9 @@ public class GameMain extends JFrame {
 
         gameUI = new GameUI(gameLogic);
         statusBar = new JLabel(gameLogic.getStatusMessage(), SwingConstants.CENTER);
-        statusBar.setFont(minecraftFont.deriveFont(Font.BOLD, 18f)); // Use Minecraft font
-        statusBar.setBackground(new Color(90, 90, 90)); // Darker background for status bar
-        statusBar.setForeground(Color.WHITE); // White text
+        statusBar.setFont(minecraftFont.deriveFont(Font.BOLD, 18f));
+        statusBar.setBackground(new Color(90, 90, 90));
+        statusBar.setForeground(Color.WHITE);
         statusBar.setOpaque(true);
 
         JPanel cp = new JPanel(new BorderLayout());
@@ -739,8 +720,7 @@ public class GameMain extends JFrame {
             MouseListener returnToMenuClickListener = new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    // Hapus listener ini setelah diklik agar tidak terpicu lagi
-                    gameUI.removeMouseListener(this); // 'this' mengacu pada instance MouseAdapter
+                    gameUI.removeMouseListener(this);
                     returnToGameModeSelection();
                 }
             };
@@ -752,7 +732,7 @@ public class GameMain extends JFrame {
         this.onlineGameId = null;
         this.myOnlineSeed = null;
         this.onlineGameManager = null;
-        this.gameLogic = null; // Reset gameLogic instance
+        this.gameLogic = null;
 
         getContentPane().removeAll();
         showHomeScreen();
@@ -763,7 +743,7 @@ public class GameMain extends JFrame {
     private void showSettingsScreen() {
         getContentPane().removeAll();
 
-        settingsPanel = new JPanel(new GridBagLayout()) { // Added GridBagLayout here
+        settingsPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -781,24 +761,23 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        settingsPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
+        settingsPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Settings", SwingConstants.CENTER);
-        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 36f)); // Use Minecraft font
+        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 36f));
         titleLabel.setForeground(Color.YELLOW);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         settingsPanel.add(titleLabel, gbc);
 
-        // Sound On/Off
         JLabel soundLabel = new JLabel("Sound:");
         soundLabel.setForeground(Color.WHITE);
-        soundLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
+        soundLabel.setFont(minecraftFont.deriveFont(20f));
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -806,8 +785,8 @@ public class GameMain extends JFrame {
 
         JRadioButton soundOn = new JRadioButton("On");
         soundOn.setForeground(Color.WHITE);
-        soundOn.setBackground(new Color(0, 0, 0, 0)); // Transparent background
-        soundOn.setFont(minecraftFont.deriveFont(18f)); // Use Minecraft font
+        soundOn.setBackground(new Color(0, 0, 0, 0));
+        soundOn.setFont(minecraftFont.deriveFont(18f));
         soundOn.setOpaque(false);
         soundOn.setSelected(true);
         soundOn.addActionListener(new ActionListener() {
@@ -822,8 +801,8 @@ public class GameMain extends JFrame {
 
         JRadioButton soundOff = new JRadioButton("Off");
         soundOff.setForeground(Color.WHITE);
-        soundOff.setBackground(new Color(0, 0, 0, 0)); // Transparent background
-        soundOff.setFont(minecraftFont.deriveFont(18f)); // Use Minecraft font
+        soundOff.setBackground(new Color(0, 0, 0, 0));
+        soundOff.setFont(minecraftFont.deriveFont(18f));
         soundOff.setOpaque(false);
         soundOff.setSelected(false);
         soundOff.addActionListener(new ActionListener() {
@@ -840,7 +819,7 @@ public class GameMain extends JFrame {
         soundGroup.add(soundOn);
         soundGroup.add(soundOff);
 
-        soundOn.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.LOW); // Or MEDIUM/HIGH
+        soundOn.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.LOW);
         soundOff.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.MUTE);
 
         MinecraftButton backButton = new MinecraftButton("Back", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
@@ -866,38 +845,33 @@ public class GameMain extends JFrame {
             currentBackgroundColor = new Color(0, 0, 0);
             currentForegroundColor = Color.WHITE;
         }
-        // Re-display the settings screen to apply changes immediately
-        showSettingsScreen(); // This re-renders the settings panel itself
-        // You might want to call repaint on other active panels too if they are part of a persistent layout
-        // For now, it will apply when you navigate to other screens because they use currentBackgroundColor/ForegroundColor
+        showSettingsScreen();
     }
 
-    // Helper method to create styled buttons for interactive feel
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 22));
-        button.setBackground(new Color(64, 154, 225)); // A pleasant blue color
-        button.setForeground(Color.WHITE); // White text
-        button.setFocusPainted(false); // Remove focus border
-        button.setBorder(BorderFactory.createLineBorder(new Color(40, 100, 150), 3)); // Custom border
+        button.setBackground(new Color(64, 154, 225));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(new Color(40, 100, 150), 3));
         button.setRolloverEnabled(true);
         button.getModel().addChangeListener(e -> {
             ButtonModel model = (ButtonModel) e.getSource();
             if (model.isRollover()) {
-                button.setBackground(new Color(80, 170, 240)); // Lighter blue on hover
+                button.setBackground(new Color(80, 170, 240));
             } else {
-                button.setBackground(new Color(64, 154, 225)); // Original blue
+                button.setBackground(new Color(64, 154, 225));
             }
         });
-        button.setPreferredSize(new Dimension(250, 60)); // Fixed size for consistency
+        button.setPreferredSize(new Dimension(250, 60));
         return button;
     }
 
-    // Inner class for Minecraft styled button
     private class MinecraftButton extends JButton {
         private BufferedImage buttonTexture;
         private BufferedImage buttonHoverTexture;
-        private BufferedImage buttonPressedTexture; // Added pressed texture
+        private BufferedImage buttonPressedTexture;
         private boolean isHovered = false;
         private boolean isPressed = false;
 
@@ -909,14 +883,13 @@ public class GameMain extends JFrame {
                 if (pressedTextureURL != null) buttonPressedTexture = ImageIO.read(pressedTextureURL);
             } catch (IOException e) {
                 e.printStackTrace();
-                // Fallback to default AWT button appearance if textures fail
-                setBackground(new Color(160, 82, 45)); // Wood-like color
+                setBackground(new Color(160, 82, 45));
                 setForeground(Color.WHITE);
-                setOpaque(true); // Ensure background is painted
+                setOpaque(true);
             }
             setFocusPainted(false);
             setBorderPainted(false);
-            setContentAreaFilled(false); // Allows us to draw our own texture
+            setContentAreaFilled(false);
 
             addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -926,7 +899,7 @@ public class GameMain extends JFrame {
 
                 public void mouseExited(java.awt.event.MouseEvent evt) {
                     isHovered = false;
-                    isPressed = false; // Reset pressed state on exit
+                    isPressed = false;
                     repaint();
                 }
 
@@ -958,16 +931,14 @@ public class GameMain extends JFrame {
             if (textureToDraw != null) {
                 g2d.drawImage(textureToDraw, 0, 0, getWidth(), getHeight(), this);
             } else {
-                // Fallback for when textures aren't loaded or configured
-                super.paintComponent(g); // Draw default button background
+                super.paintComponent(g);
             }
 
-            // Draw text over the texture
             g2d.setFont(getFont());
             FontMetrics fm = g2d.getFontMetrics();
             int x = (getWidth() - fm.stringWidth(getText())) / 2;
             int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            g2d.setColor(getForeground()); // Assuming foreground color is set for text
+            g2d.setColor(getForeground());
             g2d.drawString(getText(), x, y);
             g2d.dispose();
         }
@@ -975,7 +946,7 @@ public class GameMain extends JFrame {
         @Override
         public Dimension getPreferredSize() {
             // Adjust preferred size to fit your textures well
-            return new Dimension(250, 60); // Example size, adjusted to be larger for better clickability/visibility
+            return new Dimension(250, 60);
         }
     }
 
