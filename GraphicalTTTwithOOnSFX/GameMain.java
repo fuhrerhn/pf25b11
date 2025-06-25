@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
@@ -20,6 +19,10 @@ public class GameMain extends JFrame {
     private static final long serialVersionUID = 1L;
 
     public static final String TITLE = "Tic Tac Toe";
+
+    // Define new constants for the overall application window size
+    public static final int APP_WIDTH = 600; // Increased width
+    public static final int APP_HEIGHT = 600; // Increased height, could be 480 or similar if prefer wider than tall
 
     private GameLogic gameLogic;
     private GameUI gameUI;
@@ -67,36 +70,44 @@ public class GameMain extends JFrame {
     // Minecraft Assets - Changed to public static
     public static BufferedImage minecraftBackground;
     public static Font minecraftFont;
-    private URL btnNormalTextureURL; // Changed from btnTextureURL
+
+    // Button texture URLs - these can remain private as they are used only within GameMain
+    private URL btnNormalTextureURL;
     private URL btnHoverTextureURL;
     private URL btnPressedTextureURL;
 
-    public GameMain() {
-        SoundEffect.initGame();
-
-        // Load Minecraft assets
+    // Static block to initialize static assets when the class is loaded
+    static {
         try {
-            // Adjust paths to your actual asset locations,
-            // relative to the GraphicalTTTwithOOnSFX package or directly under resources
-            // Corrected path from GraphicalTTTwithOOnSFX/GraphicalTTTwithOOnSFX.assets/
-            minecraftBackground = ImageIO.read(getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_background.png"));
-            minecraftFont = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("GraphicalTTTwithOOnSFX/assets/minecraft.ttf")).deriveFont(24f);
+            minecraftBackground = ImageIO.read(GameMain.class.getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_background.png"));
+            minecraftFont = Font.createFont(Font.TRUETYPE_FONT, GameMain.class.getClassLoader().getResourceAsStream("GraphicalTTTwithOOnSFX/assets/minecraft.ttf")).deriveFont(24f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(minecraftFont);
-
-            // Corrected paths for buttons
-            btnNormalTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_normal.png");
-            btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_hover.png");
-            btnPressedTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_pressed.png");
-
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to load Minecraft assets! Please check file paths and ensure assets are in 'src/main/resources/GraphicalTTTwithOOnSFX/assets/'.", "Error", JOptionPane.ERROR_MESSAGE);
             // Fallback to default fonts/colors if assets fail to load
+            System.err.println("Failed to load Minecraft assets in static block! Falling back to default fonts/colors.");
             minecraftFont = new Font("Monospaced", Font.BOLD, 24); // Fallback font
             currentBackgroundColor = new Color(64, 64, 64);
             currentForegroundColor = Color.WHITE;
         }
+    }
+
+
+    public GameMain() {
+        SoundEffect.initGame();
+
+        // Load button textures here, as they are not static and tied to instance
+        try {
+            btnNormalTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_normal.png");
+            btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_hover.png");
+            btnPressedTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_pressed.png");
+
+        } catch (Exception e) { // Catch all exceptions for URL loading
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load Minecraft button assets! Please check file paths and ensure assets are in 'src/main/resources/GraphicalTTTwithOOnSFX/assets/'.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(TITLE);
@@ -125,7 +136,7 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        loginPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
+        loginPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -239,7 +250,7 @@ public class GameMain extends JFrame {
 
         getContentPane().removeAll();
 
-        homePanel = new JPanel(new GridBagLayout()) { // Added GridBagLayout here
+        homePanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -257,8 +268,7 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        homePanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
-        // homePanel.setBackground(currentBackgroundColor); // No longer needed with custom paintComponent
+        homePanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
@@ -273,17 +283,17 @@ public class GameMain extends JFrame {
         homePanel.add(titleLabel, gbc);
 
         MinecraftButton singlePlayerButton = new MinecraftButton("Single Player", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        singlePlayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        singlePlayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridy = 1;
         homePanel.add(singlePlayerButton, gbc);
 
         MinecraftButton multiplayerButton = new MinecraftButton("Multiplayer", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        multiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        multiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridy = 2;
         homePanel.add(multiplayerButton, gbc);
 
         MinecraftButton settingsButton = new MinecraftButton("Settings", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        settingsButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        settingsButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridy = 3;
         homePanel.add(settingsButton, gbc);
 
@@ -308,7 +318,7 @@ public class GameMain extends JFrame {
     private void showMultiplayerOptions() {
         getContentPane().removeAll();
 
-        multiplayerOptionPanel = new JPanel(new GridBagLayout()) { // Added GridBagLayout here
+        multiplayerOptionPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -326,8 +336,7 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        multiplayerOptionPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
-        // multiplayerOptionPanel.setBackground(currentBackgroundColor); // No longer needed
+        multiplayerOptionPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -342,17 +351,17 @@ public class GameMain extends JFrame {
         multiplayerOptionPanel.add(titleLabel, gbc);
 
         MinecraftButton offlineMultiplayerButton = new MinecraftButton("Multiplayer Offline", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        offlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        offlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridy = 1;
         multiplayerOptionPanel.add(offlineMultiplayerButton, gbc);
 
         MinecraftButton onlineMultiplayerButton = new MinecraftButton("Multiplayer Online", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        onlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        onlineMultiplayerButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridy = 2;
         multiplayerOptionPanel.add(onlineMultiplayerButton, gbc);
 
         MinecraftButton backButton = new MinecraftButton("Kembali", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridy = 3;
         multiplayerOptionPanel.add(backButton, gbc);
 
@@ -383,7 +392,7 @@ public class GameMain extends JFrame {
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
         UIManager.put("Button.background", new Color(160, 82, 45)); // Minecraft wood color
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+        UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
 
         String[] difficulties = {"Easy", "Medium", "Hard"};
         String selectedDifficulty = (String) JOptionPane.showInputDialog(
@@ -430,7 +439,7 @@ public class GameMain extends JFrame {
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
         UIManager.put("Button.background", new Color(160, 82, 45)); // Minecraft wood color
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+        UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
 
         Object[] options = {"Buat Game Baru", "Bergabung Game"};
         int choice = JOptionPane.showOptionDialog(
@@ -484,7 +493,7 @@ public class GameMain extends JFrame {
             UIManager.put("OptionPane.messageForeground", Color.WHITE);
             UIManager.put("Button.background", new Color(160, 82, 45));
             UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+            UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
 
             JOptionPane.showMessageDialog(this, "Game ID Anda: " + onlineGameId + "\nAnda adalah Player X. Menunggu pemain lain...", "Buat Game Online", JOptionPane.INFORMATION_MESSAGE);
 
@@ -520,7 +529,7 @@ public class GameMain extends JFrame {
             UIManager.put("OptionPane.messageForeground", Color.RED);
             UIManager.put("Button.background", new Color(160, 82, 45));
             UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+            UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
 
             JOptionPane.showMessageDialog(this, "Gagal membuat game online: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
@@ -542,11 +551,11 @@ public class GameMain extends JFrame {
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
         UIManager.put("Button.background", new Color(160, 82, 45));
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+        UIManager.put("Button.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
         UIManager.put("TextField.background", new Color(90, 90, 90));
         UIManager.put("TextField.foreground", Color.WHITE);
         UIManager.put("TextField.caretForeground", Color.WHITE);
-        UIManager.put("TextField.font", minecraftFont.deriveFont(18f));
+        UIManager.put("TextField.font", minecraftFont.deriveFont(18f)); // Use Minecraft font
 
 
         String idInput = JOptionPane.showInputDialog(this, "Masukkan Game ID:");
@@ -754,15 +763,14 @@ public class GameMain extends JFrame {
                 }
             }
         };
-        settingsPanel.setPreferredSize(new Dimension(Board.CANVAS_WIDTH, Board.CANVAS_HEIGHT));
-        // settingsPanel.setBackground(currentBackgroundColor); // No longer needed
+        settingsPanel.setPreferredSize(new Dimension(APP_WIDTH, APP_HEIGHT)); // Use new APP_WIDTH/HEIGHT
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel titleLabel = new JLabel("Settings", SwingConstants.CENTER);
-        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 36f));
+        titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 36f)); // Use Minecraft font
         titleLabel.setForeground(Color.YELLOW);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -772,7 +780,7 @@ public class GameMain extends JFrame {
         // Theme Selection
         JLabel themeLabel = new JLabel("Theme:");
         themeLabel.setForeground(Color.WHITE);
-        themeLabel.setFont(minecraftFont.deriveFont(20f));
+        themeLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
@@ -782,7 +790,7 @@ public class GameMain extends JFrame {
         JRadioButton lightTheme = new JRadioButton("Light");
         lightTheme.setForeground(Color.WHITE);
         lightTheme.setBackground(new Color(0, 0, 0, 0)); // Transparent background for radio buttons
-        lightTheme.setFont(minecraftFont.deriveFont(18f));
+        lightTheme.setFont(minecraftFont.deriveFont(18f)); // Use Minecraft font
         lightTheme.setOpaque(false); // Make transparent
         lightTheme.setSelected(currentBackgroundColor.equals(Color.WHITE));
         gbc.gridx = 1;
@@ -792,7 +800,7 @@ public class GameMain extends JFrame {
         JRadioButton darkTheme = new JRadioButton("Dark");
         darkTheme.setForeground(Color.WHITE);
         darkTheme.setBackground(new Color(0, 0, 0, 0)); // Transparent background for radio buttons
-        darkTheme.setFont(minecraftFont.deriveFont(18f));
+        darkTheme.setFont(minecraftFont.deriveFont(18f)); // Use Minecraft font
         darkTheme.setOpaque(false); // Make transparent
         darkTheme.setSelected(currentBackgroundColor.equals(new Color(0, 0, 0)));
         gbc.gridx = 1;
@@ -809,7 +817,7 @@ public class GameMain extends JFrame {
         // Sound On/Off
         JLabel soundLabel = new JLabel("Sound:");
         soundLabel.setForeground(Color.WHITE);
-        soundLabel.setFont(minecraftFont.deriveFont(20f));
+        soundLabel.setFont(minecraftFont.deriveFont(20f)); // Use Minecraft font
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -818,7 +826,7 @@ public class GameMain extends JFrame {
         JRadioButton soundOn = new JRadioButton("On");
         soundOn.setForeground(Color.WHITE);
         soundOn.setBackground(new Color(0, 0, 0, 0)); // Transparent background
-        soundOn.setFont(minecraftFont.deriveFont(18f));
+        soundOn.setFont(minecraftFont.deriveFont(18f)); // Use Minecraft font
         soundOn.setOpaque(false);
         soundOn.setSelected(SoundEffect.volume != SoundEffect.Volume.MUTE);
         gbc.gridx = 1;
@@ -828,7 +836,7 @@ public class GameMain extends JFrame {
         JRadioButton soundOff = new JRadioButton("Off");
         soundOff.setForeground(Color.WHITE);
         soundOff.setBackground(new Color(0, 0, 0, 0)); // Transparent background
-        soundOff.setFont(minecraftFont.deriveFont(18f));
+        soundOff.setFont(minecraftFont.deriveFont(18f)); // Use Minecraft font
         soundOff.setOpaque(false);
         soundOff.setSelected(SoundEffect.volume == SoundEffect.Volume.MUTE);
         gbc.gridx = 1;
@@ -844,7 +852,7 @@ public class GameMain extends JFrame {
 
         // Back Button
         MinecraftButton backButton = new MinecraftButton("Kembali", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
+        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
