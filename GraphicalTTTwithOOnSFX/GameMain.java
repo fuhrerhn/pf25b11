@@ -42,7 +42,6 @@ public class GameMain extends JFrame {
     private JPanel loginPanel;
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JButton loginButton;
     private JLabel statusLabel;
 
     private JPanel homePanel;
@@ -80,9 +79,8 @@ public class GameMain extends JFrame {
             ge.registerFont(minecraftFont);
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
-            // Fallback to default fonts/colors if assets fail to load
             System.err.println("Failed to load Minecraft assets in static block! Falling back to default fonts/colors.");
-            minecraftFont = new Font("Monospaced", Font.BOLD, 24); // Fallback font
+            minecraftFont = new Font("Monospaced", Font.BOLD, 24);
             currentBackgroundColor = new Color(64, 64, 64);
             currentForegroundColor = Color.WHITE;
         }
@@ -90,13 +88,11 @@ public class GameMain extends JFrame {
 
     public GameMain() {
         SoundEffect.initGame();
-
         try {
             btnNormalTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_normal.png");
             btnHoverTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_hover.png");
             btnPressedTextureURL = getClass().getClassLoader().getResource("GraphicalTTTwithOOnSFX/assets/minecraft_button_pressed.png");
-
-        } catch (Exception e) { // Catch all exceptions for URL loading
+        } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to load Minecraft button assets! Please check file paths and ensure assets are in 'src/main/resources/GraphicalTTTwithOOnSFX/assets/'.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -114,7 +110,6 @@ public class GameMain extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (minecraftBackground != null) {
-                    // Tile the background if it's smaller than the panel
                     int tileWidth = minecraftBackground.getWidth();
                     int tileHeight = minecraftBackground.getHeight();
                     for (int x = 0; x < getWidth(); x += tileWidth) {
@@ -123,7 +118,7 @@ public class GameMain extends JFrame {
                         }
                     }
                 } else {
-                    g.setColor(new Color(64, 64, 64)); // Fallback color
+                    g.setColor(new Color(64, 64, 64));
                     g.fillRect(0, 0, getWidth(), getHeight());
                 }
             }
@@ -168,7 +163,7 @@ public class GameMain extends JFrame {
         gbc.gridwidth = 1;
         loginPanel.add(passLabel, gbc);
 
-        passwordField = new JPasswordField(15);
+        JPasswordField passwordField = new JPasswordField(15);
         passwordField.setFont(new Font("Arial", Font.PLAIN, 20));
         passwordField.setBackground(new Color(90, 90, 90));
         passwordField.setForeground(Color.WHITE);
@@ -177,6 +172,7 @@ public class GameMain extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 2;
         loginPanel.add(passwordField, gbc);
+        this.passwordField = passwordField;
 
         MinecraftButton loginButton = new MinecraftButton("Login", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
         loginButton.setFont(minecraftFont.deriveFont(Font.BOLD, 24f));
@@ -215,7 +211,7 @@ public class GameMain extends JFrame {
             if (rs.next()) {
                 currentOnlineUser = username;
                 statusLabel.setForeground(Color.GREEN);
-                statusLabel.setText("Login Berhasil! Selamat datang, " + username + "!");
+                statusLabel.setText("Login Successful! Welcome, " + username + "!");
                 int delay = 1000;
                 Timer timer = new Timer(delay, new ActionListener() {
                     @Override
@@ -228,11 +224,11 @@ public class GameMain extends JFrame {
                 timer.start();
             } else {
                 statusLabel.setForeground(Color.RED);
-                statusLabel.setText("Username atau password salah!");
+                statusLabel.setText("Username or password may be wrong!");
             }
         } catch (SQLException ex) {
             statusLabel.setForeground(Color.RED);
-            statusLabel.setText("Koneksi database gagal: " + ex.getMessage());
+            statusLabel.setText("Connection to Database Failed: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -339,7 +335,7 @@ public class GameMain extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel titleLabel = new JLabel("Pilih Mode Multiplayer", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Choose Multiplayer Mode", SwingConstants.CENTER);
         titleLabel.setFont(minecraftFont.deriveFont(Font.BOLD, 28f));
         titleLabel.setForeground(Color.YELLOW);
         gbc.gridx = 0;
@@ -383,13 +379,34 @@ public class GameMain extends JFrame {
         repaint();
     }
 
-    private void showAIDifficultySelection() {
+    private void applyMinecraftOptionPaneTheme() {
         UIManager.put("OptionPane.background", new Color(64, 64, 64));
         UIManager.put("Panel.background", new Color(64, 64, 64));
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
         UIManager.put("Button.background", new Color(160, 82, 45));
         UIManager.put("Button.foreground", Color.WHITE);
         UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+        UIManager.put("TextField.background", new Color(90, 90, 90));
+        UIManager.put("TextField.foreground", Color.WHITE);
+        UIManager.put("TextField.caretForeground", Color.WHITE);
+        UIManager.put("TextField.font", minecraftFont.deriveFont(18f));
+    }
+
+    private void resetOptionPaneTheme() {
+        UIManager.put("OptionPane.background", null);
+        UIManager.put("Panel.background", null);
+        UIManager.put("OptionPane.messageForeground", null);
+        UIManager.put("Button.background", null);
+        UIManager.put("Button.foreground", null);
+        UIManager.put("Button.font", null);
+        UIManager.put("TextField.background", null);
+        UIManager.put("TextField.foreground", null);
+        UIManager.put("TextField.caretForeground", null);
+        UIManager.put("TextField.font", null);
+    }
+
+    private void showAIDifficultySelection() {
+        applyMinecraftOptionPaneTheme();
 
         String[] difficulties = {"Easy", "Medium", "Hard"};
         String selectedDifficulty = (String) JOptionPane.showInputDialog(
@@ -397,17 +414,12 @@ public class GameMain extends JFrame {
                 "Choose Difficulty:",
                 "Difficulty",
                 JOptionPane.QUESTION_MESSAGE,
-                null, // No icon
+                null,
                 difficulties,
                 difficulties[0]
         );
 
-        UIManager.put("OptionPane.background", null);
-        UIManager.put("Panel.background", null);
-        UIManager.put("OptionPane.messageForeground", null);
-        UIManager.put("Button.background", null);
-        UIManager.put("Button.foreground", null);
-        UIManager.put("Button.font", null);
+        resetOptionPaneTheme();
 
         if (selectedDifficulty != null) {
             switch (selectedDifficulty) {
@@ -428,19 +440,13 @@ public class GameMain extends JFrame {
     }
 
     private void showOnlineGameOptions() {
-        // Customizing JOptionPane for Minecraft theme is tricky.
-        UIManager.put("OptionPane.background", new Color(64, 64, 64));
-        UIManager.put("Panel.background", new Color(64, 64, 64));
-        UIManager.put("OptionPane.messageForeground", Color.WHITE);
-        UIManager.put("Button.background", new Color(160, 82, 45));
-        UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+        applyMinecraftOptionPaneTheme();
 
         Object[] options = {"Create New Game", "Join Game"};
         int choice = JOptionPane.showOptionDialog(
                 this,
-                "Choose option:",
-                "Game Online",
+                "Choose an option:",
+                "Online Mode",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -448,12 +454,7 @@ public class GameMain extends JFrame {
                 options[0]
         );
 
-        UIManager.put("OptionPane.background", null);
-        UIManager.put("Panel.background", null);
-        UIManager.put("OptionPane.messageForeground", null);
-        UIManager.put("Button.background", null);
-        UIManager.put("Button.foreground", null);
-        UIManager.put("Button.font", null);
+        resetOptionPaneTheme();
 
         if (choice == JOptionPane.YES_OPTION) {
             this.gameMode = GameMode.PLAYER_VS_PLAYER_ONLINE;
@@ -484,19 +485,9 @@ public class GameMain extends JFrame {
             onlineGameManager = new OnlineGameManager(this, gameLogic, onlineGameId, myOnlineSeed, currentOnlineUser);
             onlineGameManager.createNewGame();
 
-            UIManager.put("OptionPane.background", new Color(64, 64, 64));
-            UIManager.put("Panel.background", new Color(64, 64, 64));
-            UIManager.put("OptionPane.messageForeground", Color.WHITE);
-            UIManager.put("Button.background", new Color(160, 82, 45));
-            UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
-            UIManager.put("OptionPane.background", null);
-            UIManager.put("Panel.background", null);
-            UIManager.put("OptionPane.messageForeground", null);
-            UIManager.put("Button.background", null);
-            UIManager.put("Button.foreground", null);
-            UIManager.put("Button.font", null);
+            applyMinecraftOptionPaneTheme();
             JOptionPane.showMessageDialog(this, "Your Room ID: " + onlineGameId + "\nYou are X. Waiting other player...", "Create Room", JOptionPane.INFORMATION_MESSAGE);
+            resetOptionPaneTheme();
 
             setupGameUI();
 
@@ -516,23 +507,13 @@ public class GameMain extends JFrame {
             });
             gameFetchTimer.start();
             updateStatusBar("Waiting Other Player...");
-
         } catch (Exception ex) {
-            UIManager.put("OptionPane.background", new Color(64, 64, 64));
-            UIManager.put("Panel.background", new Color(64, 64, 64));
+            applyMinecraftOptionPaneTheme();
             UIManager.put("OptionPane.messageForeground", Color.RED);
-            UIManager.put("Button.background", new Color(160, 82, 45));
-            UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
             JOptionPane.showMessageDialog(this, "Failed to Create Room: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
-            UIManager.put("OptionPane.background", null);
-            UIManager.put("Panel.background", null);
-            UIManager.put("OptionPane.messageForeground", null);
-            UIManager.put("Button.background", null);
-            UIManager.put("Button.foreground", null);
-            UIManager.put("Button.font", null);
+            resetOptionPaneTheme();
 
             ex.printStackTrace();
             showOnlineGameOptions();
@@ -540,29 +521,11 @@ public class GameMain extends JFrame {
     }
 
     private void joinOnlineGame() {
-        UIManager.put("OptionPane.background", new Color(64, 64, 64));
-        UIManager.put("Panel.background", new Color(64, 64, 64));
-        UIManager.put("OptionPane.messageForeground", Color.WHITE);
-        UIManager.put("Button.background", new Color(160, 82, 45));
-        UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("Button.font", minecraftFont.deriveFont(18f));
-        UIManager.put("TextField.background", new Color(90, 90, 90));
-        UIManager.put("TextField.foreground", Color.WHITE);
-        UIManager.put("TextField.caretForeground", Color.WHITE);
-        UIManager.put("TextField.font", minecraftFont.deriveFont(18f));
+        applyMinecraftOptionPaneTheme();
 
         String idInput = JOptionPane.showInputDialog(this, "Enter Room ID");
 
-        UIManager.put("OptionPane.background", null);
-        UIManager.put("Panel.background", null);
-        UIManager.put("OptionPane.messageForeground", null);
-        UIManager.put("Button.background", null);
-        UIManager.put("Button.foreground", null);
-        UIManager.put("Button.font", null);
-        UIManager.put("TextField.background", null);
-        UIManager.put("TextField.foreground", null);
-        UIManager.put("TextField.caretForeground", null);
-        UIManager.put("TextField.font", null);
+        resetOptionPaneTheme();
 
         if (idInput != null && !idInput.trim().isEmpty()) {
             onlineGameId = idInput.trim();
@@ -579,21 +542,11 @@ public class GameMain extends JFrame {
             onlineGameManager = new OnlineGameManager(this, gameLogic, onlineGameId, myOnlineSeed, currentOnlineUser);
 
             if (onlineGameManager.joinExistingGame()) {
-                UIManager.put("OptionPane.background", new Color(64, 64, 64));
-                UIManager.put("Panel.background", new Color(64, 64, 64));
-                UIManager.put("OptionPane.messageForeground", Color.WHITE);
-                UIManager.put("Button.background", new Color(160, 82, 45));
-                UIManager.put("Button.foreground", Color.WHITE);
-                UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+                applyMinecraftOptionPaneTheme();
 
                 JOptionPane.showMessageDialog(this, "Successfully Joined the Room " + onlineGameId + "!\nYou Are O.", "Joining Online Room", JOptionPane.INFORMATION_MESSAGE);
 
-                UIManager.put("OptionPane.background", null);
-                UIManager.put("Panel.background", null);
-                UIManager.put("OptionPane.messageForeground", null);
-                UIManager.put("Button.background", null);
-                UIManager.put("Button.foreground", null);
-                UIManager.put("Button.font", null);
+                resetOptionPaneTheme();
 
                 setupGameUI();
 
@@ -613,21 +566,12 @@ public class GameMain extends JFrame {
                 updateStatusBar(gameLogic.getStatusMessage());
 
             } else {
-                UIManager.put("OptionPane.background", new Color(64, 64, 64));
-                UIManager.put("Panel.background", new Color(64, 64, 64));
+                applyMinecraftOptionPaneTheme();
                 UIManager.put("OptionPane.messageForeground", Color.RED);
-                UIManager.put("Button.background", new Color(160, 82, 45));
-                UIManager.put("Button.foreground", Color.WHITE);
-                UIManager.put("Button.font", minecraftFont.deriveFont(18f));
 
                 JOptionPane.showMessageDialog(this, "Failed to Join. Room ID may be Invalid or Full.", "Error", JOptionPane.ERROR_MESSAGE);
 
-                UIManager.put("OptionPane.background", null);
-                UIManager.put("Panel.background", null);
-                UIManager.put("OptionPane.messageForeground", null);
-                UIManager.put("Button.background", null);
-                UIManager.put("Button.foreground", null);
-                UIManager.put("Button.font", null);
+                resetOptionPaneTheme();
 
                 showOnlineGameOptions();
             }
@@ -640,7 +584,6 @@ public class GameMain extends JFrame {
         if (gameFetchTimer != null && gameFetchTimer.isRunning()) {
             gameFetchTimer.stop();
         }
-
         if (gameMode == GameMode.PLAYER_VS_AI || gameMode == GameMode.PLAYER_VS_PLAYER_LOCAL) {
             gameLogic = new GameLogic();
             gameLogic.setGameMainInstance(this);
@@ -675,11 +618,6 @@ public class GameMain extends JFrame {
         setVisible(true);
 
         if (gameMode == GameMode.PLAYER_VS_PLAYER_ONLINE) {
-            if (myOnlineSeed == Seed.NOUGHT) {
-                // Timer already started in joinOnlineGame
-            } else {
-                // For X, timer already started in createOnlineGame
-            }
             updateStatusBar(gameLogic.getStatusMessage());
         }
     }
@@ -701,19 +639,9 @@ public class GameMain extends JFrame {
             gameFetchTimer.stop();
         }
         SwingUtilities.invokeLater(() -> {
-            UIManager.put("OptionPane.background", new Color(64, 64, 64));
-            UIManager.put("Panel.background", new Color(64, 64, 64));
-            UIManager.put("OptionPane.messageForeground", Color.WHITE);
-            UIManager.put("Button.background", new Color(160, 82, 45));
-            UIManager.put("Button.foreground", Color.WHITE);
-            UIManager.put("Button.font", minecraftFont.deriveFont(18f));
+            applyMinecraftOptionPaneTheme();
+            resetOptionPaneTheme();
 
-            UIManager.put("OptionPane.background", null);
-            UIManager.put("Panel.background", null);
-            UIManager.put("OptionPane.messageForeground", null);
-            UIManager.put("Button.background", null);
-            UIManager.put("Button.foreground", null);
-            UIManager.put("Button.font", null);
             if (statusBar != null) {
                 statusBar.setText(gameLogic.getStatusMessage() + " Click anywhere to continue");
             }
@@ -823,7 +751,7 @@ public class GameMain extends JFrame {
         soundOff.addActionListener(e -> SoundEffect.volume = SoundEffect.Volume.MUTE);
 
         MinecraftButton backButton = new MinecraftButton("Back", btnNormalTextureURL, btnHoverTextureURL, btnPressedTextureURL);
-        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f)); // Use Minecraft font
+        backButton.setFont(minecraftFont.deriveFont(Font.BOLD, 22f));
         backButton.setForeground(Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -835,37 +763,6 @@ public class GameMain extends JFrame {
         setContentPane(settingsPanel);
         revalidate();
         repaint();
-    }
-
-    private void applyTheme(boolean isLightTheme) {
-        if (isLightTheme) {
-            currentBackgroundColor = Color.WHITE;
-            currentForegroundColor = Color.BLACK;
-        } else {
-            currentBackgroundColor = new Color(0, 0, 0);
-            currentForegroundColor = Color.WHITE;
-        }
-        showSettingsScreen();
-    }
-
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 22));
-        button.setBackground(new Color(64, 154, 225));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(new Color(40, 100, 150), 3));
-        button.setRolloverEnabled(true);
-        button.getModel().addChangeListener(e -> {
-            ButtonModel model = (ButtonModel) e.getSource();
-            if (model.isRollover()) {
-                button.setBackground(new Color(80, 170, 240));
-            } else {
-                button.setBackground(new Color(64, 154, 225));
-            }
-        });
-        button.setPreferredSize(new Dimension(250, 60));
-        return button;
     }
 
     private class MinecraftButton extends JButton {
@@ -945,7 +842,6 @@ public class GameMain extends JFrame {
 
         @Override
         public Dimension getPreferredSize() {
-            // Adjust preferred size to fit your textures well
             return new Dimension(250, 60);
         }
     }
@@ -957,7 +853,6 @@ public class GameMain extends JFrame {
                 new GameMain();
                 SoundEffect.loadAndPlayBGM();
             }
-
         });
     }
 }

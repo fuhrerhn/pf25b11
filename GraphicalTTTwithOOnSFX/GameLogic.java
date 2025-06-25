@@ -1,7 +1,6 @@
 package GraphicalTTTwithOOnSFX;
 
 import java.awt.event.MouseEvent;
-// Tambahkan import ini
 import javax.swing.SwingUtilities;
 
 public class GameLogic {
@@ -13,9 +12,9 @@ public class GameLogic {
     private GameMain.GameMode gameMode;
 
     private String onlineGameId;
-    private Seed myOnlineSeed; // Seed untuk player yang sedang login di mode online
-    private String currentOnlineUser; // Username user yang sedang login
-    private GameMain gameMainInstance; // Referensi ke GameMain
+    private Seed myOnlineSeed;
+    private String currentOnlineUser;
+    private GameMain gameMainInstance;
 
     public GameLogic() {
         initGame();
@@ -26,7 +25,6 @@ public class GameLogic {
         board.initGame();
         currentState = State.PLAYING;
         currentPlayer = Seed.CROSS;
-        // SoundEffect.initGame() should not be here, it should be called once in GameMain
     }
 
     public void newGame() {
@@ -65,7 +63,6 @@ public class GameLogic {
         this.currentOnlineUser = currentOnlineUser;
     }
 
-    // Tambahkan setter untuk GameMain instance
     public void setGameMainInstance(GameMain instance) {
         this.gameMainInstance = instance;
     }
@@ -76,28 +73,24 @@ public class GameLogic {
             int mouseX = e.getX();
             int mouseY = e.getY();
 
-            // Dapatkan baris dan kolom yang diklik
             int rowSelected = mouseY / Cell.SIZE;
             int colSelected = mouseX / Cell.SIZE;
 
             if (rowSelected >= 0 && rowSelected < Board.ROWS &&
                     colSelected >= 0 && colSelected < Board.COLS &&
-                    board.cells[rowSelected][colSelected].content == Seed.NO_SEED) { // If cell is empty
+                    board.cells[rowSelected][colSelected].content == Seed.NO_SEED) {
 
                 if (gameMode == GameMain.GameMode.PLAYER_VS_PLAYER_ONLINE) {
-                    // Hanya izinkan player online untuk bergerak jika gilirannya
                     if (currentPlayer == myOnlineSeed) {
-                        // Kirim move ke OnlineGameManager melalui GameMain
                         if (gameMainInstance != null) {
                             gameMainInstance.requestOnlineMove(rowSelected, colSelected);
                         }
                     } else {
-                        // Tampilkan pesan bahwa bukan giliran Anda
                         if (gameMainInstance != null) {
                             gameMainInstance.updateStatusBar("Bukan giliran Anda! Menunggu lawan...");
                         }
                     }
-                } else { // Local game (PvP Local or PvE)
+                } else {
                     board.cells[rowSelected][colSelected].content = currentPlayer;
                     SoundEffect.EAT_FOOD.play();
                     updateGameState(currentPlayer, rowSelected, colSelected);
@@ -105,10 +98,9 @@ public class GameLogic {
                     if (currentState == State.PLAYING) {
                         currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
                         if (gameMode == GameMain.GameMode.PLAYER_VS_AI && currentPlayer == Seed.NOUGHT) {
-                            // Delay for AI move to make it feel more natural
                             SwingUtilities.invokeLater(() -> {
                                 try {
-                                    Thread.sleep(500); // Small delay
+                                    Thread.sleep(500);
                                 } catch (InterruptedException ex) {
                                     Thread.currentThread().interrupt();
                                 }
@@ -119,33 +111,6 @@ public class GameLogic {
                 }
             }
         }
-        // Pastikan UI diperbarui setelah setiap klik
-        if (gameMainInstance != null) {
-            gameMainInstance.updateStatusBar(getStatusMessage());
-            gameMainInstance.repaint(); // Minta GameMain untuk me-repaint seluruh UI
-        }
-    }
-
-    // Metode untuk menerima dan menerapkan gerakan online dari database
-    // Note: This method seems redundant with the updated stepGame.
-    // Consider unifying logic into stepGame if possible, or ensuring distinct uses.
-    public void applyOnlineMove(int row, int col, Seed playerSeed, State newGameState, Seed newCurrentPlayer) {
-        // Hanya terapkan jika ada perubahan atau jika ini giliran lawan dan kita menerima gerakannya
-        if (board.cells[row][col].content == Seed.NO_SEED) {
-            board.cells[row][col].content = playerSeed;
-            SoundEffect.EAT_FOOD.play();
-        }
-        // Update game state and current player based on fetched data
-        this.currentState = newGameState;
-        this.currentPlayer = newCurrentPlayer;
-
-        // Periksa apakah game sudah selesai
-        if (currentState != State.PLAYING && currentState != State.WAITING) {
-            if (gameMainInstance != null) {
-                gameMainInstance.showGameOverDisplay();
-            }
-        }
-        // Perbarui status bar
         if (gameMainInstance != null) {
             gameMainInstance.updateStatusBar(getStatusMessage());
             gameMainInstance.repaint();
@@ -158,7 +123,6 @@ public class GameLogic {
         } else if (board.isDraw()) {
             currentState = State.DRAW;
         }
-        // Jika game selesai, beritahu GameMain
         if (currentState != State.PLAYING) {
             if (gameMainInstance != null) {
                 gameMainInstance.showGameOverDisplay();
@@ -168,19 +132,17 @@ public class GameLogic {
 
     public void makeAIMove() {
         if (aiPlayer == null) {
-            // Bot selalu NOUGHT, player selalu CROSS
             aiPlayer = new Bot(Seed.NOUGHT, Seed.CROSS, aiDifficulty);
         }
         char[][] boardState = convertBoardToChar(board);
         int[] move = aiPlayer.getBotMove(boardState);
         if (move != null) {
             board.cells[move[0]][move[1]].content = Seed.NOUGHT;
-            SoundEffect.EXPLODE.play(); // Consider a different sound for AI move
+            SoundEffect.EXPLODE.play();
             updateGameState(Seed.NOUGHT, move[0], move[1]);
             if (currentState == State.PLAYING) {
                 currentPlayer = Seed.CROSS;
             }
-            // Perbarui status bar setelah AI bergerak
             if (gameMainInstance != null) {
                 gameMainInstance.updateStatusBar(getStatusMessage());
                 gameMainInstance.repaint();
@@ -261,7 +223,6 @@ public class GameLogic {
         return currentState;
     }
 
-    // Metode untuk mengambil string representasi papan saat ini
     public String getBoardStateAsString() {
         StringBuilder sb = new StringBuilder();
         for (int r = 0; r < Board.ROWS; r++) {

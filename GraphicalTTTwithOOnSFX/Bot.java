@@ -10,7 +10,6 @@ public class Bot {
     private Random random;
     private GameMain.AIDifficulty difficulty;
 
-    // UBAH TIPE PARAMETER botSeed dan humanSeed dari 'char' menjadi 'Seed'
     public Bot(Seed botSeed, Seed humanSeed, GameMain.AIDifficulty difficulty) {
         this.botPlayerMark = (botSeed == Seed.CROSS) ? 'X' : 'O';
         this.opponentPlayerMark = (humanSeed == Seed.CROSS) ? 'X' : 'O';
@@ -75,7 +74,7 @@ public class Bot {
             return emptyCorners.get(random.nextInt(emptyCorners.size()));
         }
 
-        int[][] sides = {{0, 1}, {1, 0}, {1, 2}, {2, 1}}; // Tambahkan pemeriksaan sisi
+        int[][] sides = {{0, 1}, {1, 0}, {1, 2}, {2, 1}};
         List<int[]> emptySides = new ArrayList<>();
         for (int[] cell : sides) {
             if (boardState[cell[0]][cell[1]] == '-') {
@@ -138,7 +137,7 @@ public class Bot {
         }
 
         if (emptyCells.isEmpty()) {
-            return new int[]{-1, -1}; // No empty cells, game is likely over
+            return new int[]{-1, -1};
         }
         return emptyCells.get(random.nextInt(emptyCells.size()));
     }
