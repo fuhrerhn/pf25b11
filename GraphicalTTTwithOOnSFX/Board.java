@@ -1,6 +1,10 @@
 package GraphicalTTTwithOOnSFX;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 /**
  * The Board class models the ROWS-by-COLS game board.
  */
@@ -15,7 +19,8 @@ public class Board {
     public static final int GRID_WIDTH_HALF = GRID_WIDTH / 2; // Grid-line's half-width
     public static final Color COLOR_GRID = Color.LIGHT_GRAY;  // grid lines
     public static final int Y_OFFSET = 1;  // Fine tune for better display
-
+    private BufferedImage backgroundImage;
+    private static final String BACKGROUND_IMAGE_PATH = "GraphicalTTTwithOOnSFX/assets/minecraft_background.png";
     // Define properties (package-visible)
     /** Composes of 2D array of ROWS-by-COLS Cell instances */
     Cell[][] cells;
@@ -23,6 +28,13 @@ public class Board {
     /** Constructor to initialize the game board */
     public Board() {
         initGame();
+        try {
+            backgroundImage = ImageIO.read(new File(BACKGROUND_IMAGE_PATH));
+        } catch (IOException e) {
+            System.err.println("Error loading background image: " + BACKGROUND_IMAGE_PATH);
+            e.printStackTrace();
+            backgroundImage = null;
+        }
     }
 
     /** Initialize the game objects (run once) */
@@ -76,6 +88,12 @@ public class Board {
 
     /** Paint itself on the graphics canvas, given the Graphics context */
     public void paint(Graphics g) {
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, null);
+        } else {
+            g.setColor(Color.WHITE); // Default background color
+            g.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
         // Draw the grid-lines
         g.setColor(COLOR_GRID);
         for (int row = 1; row < ROWS; ++row) {

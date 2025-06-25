@@ -36,8 +36,6 @@ public class GameUI extends JPanel {
                 repaint();
             }
         });
-
-        // No need to load background here, access it directly from GameMain.minecraftBackground
     }
 
     @Override
@@ -98,4 +96,6 @@ public class GameUI extends JPanel {
         int y = (Board.CANVAS_HEIGHT - (int) r2d.getHeight()) / 2 + fm.getAscent();
         g2d.drawString(message, x, y);
     }
+
+
 }
